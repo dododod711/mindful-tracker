@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mindful — a free daily mental health check-in. Track your mood, sleep, and stress, journal your thoughts, and spot weekly patterns. No account needed." />
+  <meta property="og:title" content="Mindful — Mental Health Tracker" />
+  <meta property="og:description" content="A quiet place to check in with yourself: track mood, sleep, and stress, journal, and spot weekly patterns. Free, no account needed." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <title>Mindful — Mental Health Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-mark">🌿</span>
+        <span class="brand-name">Mindful</span>
+      </div>
+      <nav class="site-nav">
+        <a href="#checkin">Check-in</a>
+        <a href="#journal">Journal</a>
+        <a href="#trends">Trends</a>
+        <a href="#assistant">Assistant</a>
+        <a href="#resources">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="reveal reveal-up">How are you feeling today?</h1>
+        <p class="hero-sub reveal reveal-up">A quiet place to check in with yourself, notice patterns, and take care of your mind.</p>
+        <p id="streak-banner" class="streak-banner" hidden></p>
+      </div>
+    </section>
+
+    <!-- Daily check-in -->
+    <section id="checkin" class="section">
+      <div class="container">
+        <h2 class="reveal reveal-left">Daily Check-in</h2>
+        <div class="card reveal reveal-left">
+          <form id="checkin-form">
+            <fieldset class="mood-fieldset">
+              <legend>Mood</legend>
+              <div class="mood-options" role="radiogroup" aria-label="Mood">
+                <label class="mood-option">
+                  <input type="radio" name="mood" value="1" required />
+                  <span class="mood-emoji">😞</span>
+                  <span class="mood-label">Rough</span>
+                </label>
+                <label class="mood-option">
+                  <input type="radio" name="mood" value="2" />
+                  <span class="mood-emoji">😕</span>
+                  <span class="mood-label">Low</span>
+                </label>
+                <label class="mood-option">
+                  <input type="radio" name="mood" value="3" />
+                  <span class="mood-emoji">😐</span>
+                  <span class="mood-label">Okay</span>
+                </label>
+                <label class="mood-option">
+                  <input type="radio" name="mood" value="4" />
+                  <span class="mood-emoji">🙂</span>
+                  <span class="mood-label">Good</span>
+                </label>
+                <label class="mood-option">
+                  <input type="radio" name="mood" value="5" />
+                  <span class="mood-emoji">😄</span>
+                  <span class="mood-label">Great</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="slider-grid">
+              <div class="slider-field">
+                <label for="sleep">Sleep <output id="sleep-out">7</output> hrs</label>
+                <input type="range" id="sleep" name="sleep" min="0" max="12" step="0.5" value="7" />
+              </div>
+              <div class="slider-field">
+                <label for="energy">Energy <output id="energy-out">5</output>/10</label>
+                <input type="range" id="energy" name="energy" min="0" max="10" value="5" />
+              </div>
+              <div class="slider-field">
+                <label for="stress">Stress <output id="stress-out">5</output>/10</label>
+                <input type="range" id="stress" name="stress" min="0" max="10" value="5" />
+              </div>
+            </div>
+
+            <fieldset class="tags-fieldset">
+              <legend>What's been part of your day?</legend>
+              <div class="tag-options">
+                <label class="tag"><input type="checkbox" name="tags" value="Exercise" /><span>🏃 Exercise</span></label>
+                <label class="tag"><input type="checkbox" name="tags" value="Friends" /><span>👥 Friends</span></label>
+                <label class="tag"><input type="checkbox" name="tags" value="Outdoors" /><span>🌳 Outdoors</span></label>
+                <label class="tag"><input type="checkbox" name="tags" value="Work/School" /><span>💼 Work / School</span></label>
+                <label class="tag"><input type="checkbox" name="tags" value="Good meal" /><span>🍲 Good meal</span></label>
+                <label class="tag"><input type="checkbox" name="tags" value="Screen time" /><span>📱 Screen time</span></label>
+              </div>
+            </fieldset>
+
+            <div class="note-field">
+              <label for="note">Anything on your mind? <span class="optional">(optional)</span></label>
+              <textarea id="note" name="note" rows="3" placeholder="One small win, one worry, anything…"></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">Save today's check-in</button>
+            <p id="save-msg" class="save-msg" role="status" hidden>Saved. Nice work checking in. 💙</p>
+          </form>
+        </div>
+
+        <!-- Journal — right below the check-in, for longer thoughts -->
+        <div id="journal" class="journal-block">
+          <h2 class="reveal reveal-left">Journal</h2>
+          <button id="new-entry-btn" class="btn-primary btn-new-entry reveal reveal-left">✏️ New entry</button>
+          <div id="composer" class="card composer" hidden>
+            <label for="journal-text">Write freely</label>
+            <textarea id="journal-text" rows="5" placeholder="What's on your mind right now?"></textarea>
+            <div class="composer-actions">
+              <button id="composer-save" class="btn-primary">Save entry</button>
+              <button id="composer-cancel" class="btn-ghost">Cancel</button>
+            </div>
+          </div>
+          <div id="entries" class="entries reveal reveal-left">
+            <p class="empty-state">No entries yet — your saved check-ins will appear here.</p>
+          </div>
+          <div class="data-actions">
+            <button id="export-data" class="btn-ghost" hidden>Export backup</button>
+            <button id="import-data" class="btn-ghost">Import backup</button>
+            <button id="clear-data" class="btn-ghost" hidden>Clear all data</button>
+            <input type="file" id="import-file" accept=".json,application/json" hidden />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trends -->
+    <section id="trends" class="section section-alt">
+      <div class="container">
+        <h2 class="reveal reveal-right">Your Last 7 Days</h2>
+        <div class="card reveal reveal-right">
+          <div id="mood-chart" class="mood-chart" aria-label="Mood over the last 7 days"></div>
+          <div class="stats-row">
+            <div class="stat">
+              <span class="stat-value" id="stat-avg-mood">–</span>
+              <span class="stat-label">Avg mood</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="stat-avg-sleep">–</span>
+              <span class="stat-label">Avg sleep</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="stat-entries">0</span>
+              <span class="stat-label">Check-ins</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="stat-streak">0</span>
+              <span class="stat-label">Day streak</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Assistant -->
+    <section id="assistant" class="section">
+      <div class="container">
+        <h2 class="reveal reveal-right">Assistant</h2>
+        <div class="card reveal reveal-right">
+          <!-- Setup panel (shown until a key is saved) -->
+          <div id="assistant-setup">
+            <p>Chat with a supportive AI companion, powered by Google Gemini. You'll need a free API key — it stays on your device.</p>
+            <ol class="assistant-steps">
+              <li>Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a></li>
+              <li>Paste it below and start chatting</li>
+            </ol>
+            <div class="key-row">
+              <input type="password" id="gemini-key" placeholder="Paste your Gemini API key" autocomplete="off" />
+              <button id="save-key" class="btn-primary">Save key</button>
+            </div>
+            <p class="assistant-privacy">Your key is stored only in this browser. When you chat, your messages and a short summary of your recent check-ins are sent to Google's Gemini API.</p>
+          </div>
+
+          <!-- Chat panel -->
+          <div id="assistant-chat" hidden>
+            <div id="chat-messages" class="chat-messages" aria-live="polite">
+              <div class="chat-bubble assistant">Hi — I'm here to listen. How's your day going?</div>
+            </div>
+            <form id="chat-form" class="chat-form">
+              <input type="text" id="chat-input" placeholder="Type a message…" autocomplete="off" />
+              <button type="submit" class="btn-primary">Send</button>
+            </form>
+            <p class="assistant-privacy">Chats aren't saved and are sent to Google's Gemini API. In crisis? Call or text <strong>988</strong>. <button type="button" id="remove-key" class="entry-delete">remove key</button></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resources -->
+    <section id="resources" class="section section-alt">
+      <div class="container">
+        <h2 class="reveal reveal-up">Resources</h2>
+        <div class="resource-grid">
+          <div class="card resource-card reveal reveal-up">
+            <h3>🫁 Box Breathing</h3>
+            <p>Breathe in for 4, hold for 4, out for 4, hold for 4. Repeat for a minute when stress climbs.</p>
+          </div>
+          <div class="card resource-card reveal reveal-up">
+            <h3>📝 3 Good Things</h3>
+            <p>Each evening, jot down three things that went well today — however small.</p>
+          </div>
+          <div class="card resource-card reveal reveal-up">
+            <h3>🚶 Take a Walk</h3>
+            <p>Ten minutes outside can shift a tough day. No destination needed.</p>
+          </div>
+          <div class="card resource-card reveal reveal-up">
+            <h3>🆘 Need to talk?</h3>
+            <p>If you're struggling, you're not alone. In the US, call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline), any time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Disclaimer -->
+    <section id="disclaimer" class="section">
+      <div class="container">
+        <div class="disclaimer reveal reveal-up">
+          <h2>⚠️ Disclaimer</h2>
+          <p>
+            Mindful is built for <strong>educational and self-reflection purposes only</strong>.
+            The trends, stats, tips, and AI assistant responses shown here are simple estimates —
+            they are not a diagnosis, can be wrong, and should not be treated as fully accurate
+            or relied upon as fact.
+          </p>
+          <p>
+            This website is not a substitute for professional advice. If you have concerns about
+            your mental health, please talk to a qualified doctor, therapist, or counselor.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Mindful — your data stays in your browser (assistant chats are sent to Google's Gemini API). For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
