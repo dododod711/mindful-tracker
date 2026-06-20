@@ -1,0 +1,455 @@
+/* ===== Mindful — Stargazing ===== */
+/* Self-contained dark, immersive theme for the motion-tracked galaxy.
+   Does not load styles.css; the header/footer are restyled to match. */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ink: #e8ecff;
+  --ink-soft: #9aa3c8;
+  --line: rgba(180, 195, 255, 0.16);
+  --panel: rgba(18, 22, 46, 0.82);
+  --serif: "Iowan Old Style", "Palatino Nova", Palatino, Georgia, "Times New Roman", serif;
+  --mind: #5fd0c0;   /* mindfulness — teal */
+  --psych: #9b8cff;  /* psychology — violet */
+  --res: #f0b27a;    /* resources — amber */
+  --you: #f2a0c0;    /* your journal — rose */
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body.stargaze {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(120% 90% at 50% -10%, #1a1f44 0%, #11132e 45%, #07081a 100%);
+  overflow: hidden;
+  line-height: 1.6;
+}
+
+/* The galaxy canvas fills the viewport behind the chrome. A canvas is a
+   replaced element, so inset:0 alone won't stretch it — set size explicitly. */
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  display: block;
+  cursor: grab;
+}
+
+/* ===== Header ===== */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.header-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1.25rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand-mark {
+  filter: drop-shadow(0 0 6px rgba(120, 200, 190, 0.6));
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.2rem 0.4rem;
+}
+
+.site-nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.site-nav a:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.site-nav a.active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Intro overlay (first thing you see) ===== */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  text-align: center;
+  background: radial-gradient(50% 50% at 50% 45%, rgba(10, 12, 30, 0.5), rgba(7, 8, 26, 0.85));
+  transition: opacity 0.6s ease;
+}
+
+.intro[hidden] {
+  display: none;
+}
+
+.intro.fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-card {
+  max-width: 30rem;
+}
+
+.intro h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  margin-bottom: 0.6rem;
+}
+
+.intro p {
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+
+.intro .fine {
+  font-size: 0.82rem;
+  margin-top: 1.1rem;
+}
+
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s, border-color 0.15s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(180, 195, 255, 0.35);
+}
+
+.btn-glow {
+  background: linear-gradient(135deg, #6f63e6, #3fb6a8);
+  border-color: transparent;
+  box-shadow: 0 10px 26px -10px rgba(110, 96, 240, 0.8);
+}
+
+.btn-glow:hover {
+  filter: brightness(1.08);
+  background: linear-gradient(135deg, #6f63e6, #3fb6a8);
+}
+
+/* ===== Bottom control bar ===== */
+.controls {
+  position: fixed;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  max-width: calc(100% - 1.5rem);
+}
+
+.controls .btn {
+  padding: 0.45rem 1.05rem;
+  font-size: 0.9rem;
+}
+
+.status {
+  align-self: center;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  padding: 0 0.6rem;
+  white-space: nowrap;
+}
+
+.status b {
+  color: var(--mind);
+  font-weight: 600;
+}
+
+/* ===== Camera preview thumbnail ===== */
+.cam-thumb {
+  position: fixed;
+  top: 4.2rem;
+  right: 1rem;
+  z-index: 20;
+  width: 132px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.7);
+}
+
+.cam-thumb[hidden] {
+  display: none;
+}
+
+.cam-thumb video {
+  display: block;
+  width: 100%;
+  /* Mirror like a front-facing camera so movement feels natural */
+  transform: scaleX(-1);
+}
+
+.cam-thumb .cam-label {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  font-size: 0.68rem;
+  text-align: center;
+  padding: 0.15rem;
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--ink-soft);
+}
+
+/* The motion-analysis canvas never needs to be seen */
+#motion {
+  display: none;
+}
+
+/* ===== Box-breathing cue ===== */
+.breath-cue {
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.breath-cue[hidden] {
+  display: none;
+}
+
+.breath-cue span {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 5vw, 2.8rem);
+  color: #eaf2ff;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.6s ease;
+}
+
+/* ===== Body info panel ===== */
+.panel {
+  position: fixed;
+  z-index: 25;
+  left: 50%;
+  bottom: 5.2rem;
+  transform: translateX(-50%) translateY(8px);
+  width: min(30rem, calc(100% - 2rem));
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.2rem 1.3rem;
+  box-shadow: 0 20px 50px -18px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.panel-chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.55rem;
+}
+
+.panel-chip.mind { background: rgba(95, 208, 192, 0.16); color: var(--mind); }
+.panel-chip.psych { background: rgba(155, 140, 255, 0.16); color: var(--psych); }
+.panel-chip.res { background: rgba(240, 178, 122, 0.16); color: var(--res); }
+.panel-chip.you { background: rgba(242, 160, 192, 0.16); color: var(--you); }
+
+.panel h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.35rem;
+  margin-bottom: 0.4rem;
+}
+
+.panel p {
+  color: #d6dbf5;
+  font-size: 0.98rem;
+  white-space: pre-wrap;     /* keep line breaks in journal entries */
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.panel-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.panel-close:hover {
+  color: var(--ink);
+}
+
+/* ===== Accessible "constellation index" list ===== */
+.index-list {
+  position: fixed;
+  z-index: 24;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(22rem, 88vw);
+  overflow-y: auto;
+  padding: 4.5rem 1.2rem 1.5rem;
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-left: 1px solid var(--line);
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.index-list.open {
+  transform: none;
+}
+
+.index-list h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.index-list ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.index-list button {
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.index-list button:hover,
+.index-list button:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(180, 195, 255, 0.4);
+  outline: none;
+}
+
+.index-list .item-cat {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.1rem;
+}
+
+.index-list .item-cat.mind { color: var(--mind); }
+.index-list .item-cat.psych { color: var(--psych); }
+.index-list .item-cat.res { color: var(--res); }
+.index-list .item-cat.you { color: var(--you); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .cam-thumb {
+    width: 104px;
+    top: 5.4rem;
+  }
+
+  .status {
+    display: none;
+  }
+}

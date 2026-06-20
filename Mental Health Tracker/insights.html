@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Mindful — see your weekly mood trends, chat with a supportive assistant, and find calming resources." />
+  <meta property="og:title" content="Mindful — Insights &amp; Support" />
+  <meta property="og:description" content="See your weekly mood trends, chat with a supportive assistant, and find calming resources." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <title>Mindful — Insights &amp; Support</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#4f7259" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Mindful" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">🌿</span>
+        <span class="brand-name">Mindful</span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="today.html#checkin">Check-in</a>
+        <a href="insights.html#trends" class="active">Trends</a>
+        <a href="galaxy.html">Stargaze</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="reveal reveal-up">Insights &amp; support</h1>
+        <p class="hero-sub reveal reveal-up">Look back over your week, talk things through, and find something calming when you need it.</p>
+      </div>
+    </section>
+
+    <!-- Trends -->
+    <section id="trends" class="section">
+      <div class="container">
+        <h2 class="reveal reveal-right">Your Last 7 Days</h2>
+        <div class="card reveal reveal-right">
+          <div id="mood-chart" class="mood-chart" aria-label="Mood over the last 7 days"></div>
+          <div class="stats-row">
+            <div class="stat">
+              <span class="stat-value" id="stat-avg-mood">–</span>
+              <span class="stat-label">Avg mood</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="stat-avg-sleep">–</span>
+              <span class="stat-label">Avg sleep</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="stat-entries">0</span>
+              <span class="stat-label">Check-ins</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="stat-streak">0</span>
+              <span class="stat-label">Day streak</span>
+            </div>
+          </div>
+          <p class="empty-state trends-empty" id="trends-empty" hidden>
+            No check-ins yet — <a href="today.html#checkin">add today's check-in</a> and your trends will show up here.
+          </p>
+        </div>
+
+        <h2 class="reveal reveal-right">What we're noticing</h2>
+        <div class="card reveal reveal-right">
+          <ul id="insights-list" class="insights">
+            <li class="insight-empty">Keep checking in — patterns will appear here once there's enough to compare.</li>
+          </ul>
+          <p class="insights-note">Gentle observations from your own check-ins, not advice or diagnosis.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Assistant -->
+    <section id="assistant" class="section section-alt">
+      <div class="container">
+        <h2 class="reveal reveal-right">Assistant</h2>
+        <div class="card reveal reveal-right">
+          <p class="assistant-intro">A supportive companion that runs entirely on your device — no account, no API key, and nothing you say ever leaves this browser.</p>
+          <div id="assistant-chat">
+            <div id="chat-messages" class="chat-messages" aria-live="polite">
+              <div class="chat-bubble assistant">Hi — I'm here to listen. How are you feeling right now?</div>
+            </div>
+            <form id="chat-form" class="chat-form">
+              <input type="text" id="chat-input" placeholder="Type a message…" autocomplete="off" />
+              <button type="submit" class="btn-primary">Send</button>
+            </form>
+            <p class="assistant-privacy">A simple on-device companion — caring, but not a therapist, and not a diagnosis. In crisis? Call or text <strong>988</strong> (US), any time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resources -->
+    <section id="resources" class="section">
+      <div class="container">
+        <h2 class="reveal reveal-up">Resources</h2>
+        <div class="resource-grid">
+          <div class="card resource-card reveal reveal-up">
+            <h3>🫁 Box Breathing</h3>
+            <p>Breathe in for 4, hold for 4, out for 4, hold for 4. Repeat for a minute when stress climbs.</p>
+          </div>
+          <div class="card resource-card reveal reveal-up">
+            <h3>📝 3 Good Things</h3>
+            <p>Each evening, jot down three things that went well today — however small.</p>
+          </div>
+          <div class="card resource-card reveal reveal-up">
+            <h3>🚶 Take a Walk</h3>
+            <p>Ten minutes outside can shift a tough day. No destination needed.</p>
+          </div>
+          <div class="card resource-card reveal reveal-up">
+            <h3>🆘 Need to talk?</h3>
+            <p>If you're struggling, you're not alone. In the US, call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline), any time.</p>
+          </div>
+        </div>
+
+        <!-- Hand-off back to the first page -->
+        <p class="page-link reveal reveal-up">
+          <a href="today.html#checkin">← Back to today's check-in</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Disclaimer -->
+    <section id="disclaimer" class="section section-alt">
+      <div class="container">
+        <div class="disclaimer reveal reveal-up">
+          <h2>⚠️ Disclaimer</h2>
+          <p>
+            Mindful is built for <strong>educational and self-reflection purposes only</strong>.
+            The trends, stats, tips, and AI assistant responses shown here are simple estimates —
+            they are not a diagnosis, can be wrong, and should not be treated as fully accurate
+            or relied upon as fact.
+          </p>
+          <p>
+            This website is not a substitute for professional advice. If you have concerns about
+            your mental health, please talk to a qualified doctor, therapist, or counselor.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Mindful — your data stays in your browser (assistant chats are sent to Google's Gemini API). For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="ui.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="Mindful Stargazing — a calm galaxy you steer with gentle movement. Drift between stars and planets carrying short notes on mindfulness, psychology, and support." />
+  <title>Mindful — Stargazing</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌌</text></svg>" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#07081a" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Mindful" />
+  <link rel="stylesheet" href="galaxy.css" />
+</head>
+<body class="stargaze">
+  <!-- The galaxy itself -->
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <!-- Off-screen elements that power motion sensing -->
+  <video id="cam" playsinline muted aria-hidden="true" style="display:none"></video>
+  <canvas id="motion" width="80" height="60" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">🌿</span>
+        <span class="brand-name">Mindful</span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="today.html#checkin">Check-in</a>
+        <a href="insights.html#trends">Trends</a>
+        <a href="galaxy.html" class="active">Stargaze</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Camera preview (shown only while the camera is on) -->
+  <div class="cam-thumb" id="cam-thumb" hidden>
+    <video id="cam-preview" playsinline muted></video>
+    <span class="cam-label">on your device only</span>
+  </div>
+
+  <!-- Intro / start overlay -->
+  <div class="intro" id="intro">
+    <div class="intro-card">
+      <h1>Take a moment to stargaze</h1>
+      <p>A ringed planet you steer with your hands. With the camera on, move a hand to orbit it, spread two hands to zoom, and pinch to open a moon — each holds a small note on mindfulness, psychology, and support, alongside your own journal entries. No camera? Your cursor (and the scroll wheel) work too.</p>
+      <div class="intro-actions">
+        <button class="btn btn-glow" id="start-camera">✦ Use my camera</button>
+        <button class="btn" id="start-pointer">Just use my cursor</button>
+      </div>
+      <p class="fine">The camera feed never leaves your device — it's only used to sense movement, and nothing is recorded or sent anywhere. You can turn it off any time.</p>
+    </div>
+  </div>
+
+  <!-- Info panel for a selected star/planet -->
+  <div class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="panel-title">
+    <button class="panel-close" id="panel-close" aria-label="Close">×</button>
+    <span class="panel-chip" id="panel-chip"></span>
+    <h2 id="panel-title"></h2>
+    <p id="panel-body"></p>
+  </div>
+
+  <!-- Accessible list of the same content (keyboard / screen-reader path) -->
+  <aside class="index-list" id="index-list" aria-label="Constellation index" aria-hidden="true">
+    <h2>The constellation</h2>
+    <ul id="index-items"></ul>
+  </aside>
+
+  <!-- Box-breathing guide overlay -->
+  <div class="breath-cue" id="breath-cue" hidden aria-live="polite">
+    <span id="breath-phase">Breathe in</span>
+  </div>
+
+  <!-- Bottom controls -->
+  <div class="controls">
+    <span class="status" id="status">Move gently to orbit the planet</span>
+    <button class="btn" id="breathe-btn">🫁 Breathe</button>
+    <button class="btn" id="toggle-camera">Camera off</button>
+    <button class="btn" id="toggle-index" aria-expanded="false" aria-controls="index-list">✦ Index</button>
+  </div>
+
+  <script src="handtracking.js"></script>
+  <script src="galaxy.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+  </script>
+</body>
+</html>
