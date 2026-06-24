@@ -87,16 +87,19 @@
       <div class="container">
         <h2 class="reveal reveal-right">Assistant</h2>
         <div class="card reveal reveal-right">
-          <p class="assistant-intro">A supportive companion that runs entirely on your device — no account, no API key, and nothing you say ever leaves this browser.</p>
+          <p class="assistant-intro">A supportive companion that reflects on your last week of journal entries and check-ins — running entirely on your device. No account, no API key, and nothing you write ever leaves this browser.</p>
           <div id="assistant-chat">
             <div id="chat-messages" class="chat-messages" aria-live="polite">
-              <div class="chat-bubble assistant">Hi — I'm here to listen. How are you feeling right now?</div>
+              <div class="chat-bubble assistant">Hi — give me a moment to look over your week…</div>
+            </div>
+            <div class="chat-actions">
+              <button type="button" id="reflect-week" class="btn-ghost">🪞 Reflect on my week</button>
             </div>
             <form id="chat-form" class="chat-form">
               <input type="text" id="chat-input" placeholder="Type a message…" autocomplete="off" />
               <button type="submit" class="btn-primary">Send</button>
             </form>
-            <p class="assistant-privacy">A simple on-device companion — caring, but not a therapist, and not a diagnosis. In crisis? Call or text <strong>988</strong> (US), any time.</p>
+            <p class="assistant-privacy">A simple on-device companion that reads only your own journal &amp; check-ins — caring, but not a therapist, and not a diagnosis. In crisis? Call or text <strong>988</strong> (US), any time.</p>
           </div>
         </div>
       </div>
@@ -154,7 +157,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>Mindful — your data stays in your browser (assistant chats are sent to Google's Gemini API). For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
+      <p>Mindful — your data stays in your browser, and the assistant runs entirely on your device. For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
     </div>
   </footer>
 

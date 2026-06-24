@@ -473,97 +473,123 @@ if (entriesList) {
 prefillCheckinForm();
 render();
 
-// ---- AI Assistant (Gemini — bring your own key) (insights page) ----
-// The key is stored only in this browser's localStorage and sent directly
-// to Google's API; there is no middleman server. Chats are session-only.
-const GEMINI_KEY = "mindful-gemini-key";
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-
-const setupPanel = document.getElementById("assistant-setup");
-const chatPanel = document.getElementById("assistant-chat");
+// ---- On-device assistant (insights page) ----
+// A supportive companion that reflects on the last 7 days of journal entries
+// and check-ins. Everything runs here in the browser: no API key, no network
+// request, and nothing the user writes ever leaves the device.
 const chatMessages = document.getElementById("chat-messages");
 const chatForm = document.getElementById("chat-form");
+const reflectBtn = document.getElementById("reflect-week");
 const chatHistory = []; // session only — not persisted
 
-function renderAssistant() {
-  if (!setupPanel || !chatPanel) return;
-  const hasKey = Boolean(localStorage.getItem(GEMINI_KEY));
-  setupPanel.hidden = hasKey;
-  chatPanel.hidden = !hasKey;
+// Themes we can recognise in free-text entries, each with a gentle suggestion.
+// Listed in priority order for when several themes show up at once.
+const THEMES = [
+  { key: "sleep", label: "sleep",
+    words: ["sleep", "tired", "exhausted", "insomnia", "awake", "restless", "drained", "fatigue", "nap"],
+    tip: "a steadier wind-down — dimming screens and lights about an hour before bed can help rest come easier." },
+  { key: "anxiety", label: "anxiety",
+    words: ["anxious", "anxiety", "worry", "worried", "nervous", "panic", "scared", "afraid", "racing", "overwhelm", "overwhelmed"],
+    tip: "a slow round of box breathing — in for 4, hold 4, out 4, hold 4 — to give a racing mind something steady to hold." },
+  { key: "stress", label: "stress",
+    words: ["stress", "stressed", "pressure", "deadline", "busy", "swamped", "overworked", "too much"],
+    tip: "naming the one thing that matters most today and letting the rest wait — you don't have to carry it all at once." },
+  { key: "work", label: "work or study",
+    words: ["work", "job", "boss", "meeting", "study", "exam", "test", "school", "class", "homework", "project", "interview", "coworker"],
+    tip: "a real break between tasks — even ten minutes away from the screen can reset your focus." },
+  { key: "relationships", label: "the people in your life",
+    words: ["friend", "family", "partner", "mom", "dad", "argument", "fight", "fought", "breakup", "lonely", "alone", "relationship"],
+    tip: "reaching out to one person you trust — even a short message tends to lighten things." },
+  { key: "low", label: "a low mood",
+    words: ["sad", "down", "depressed", "hopeless", "empty", "cry", "crying", "unmotivated", "numb", "worthless", "miserable"],
+    tip: "one small kindness toward yourself — a warm drink, a short walk, a favourite song — without needing to fix everything." },
+  { key: "anger", label: "frustration",
+    words: ["angry", "mad", "frustrated", "annoyed", "irritated", "furious", "rage"],
+    tip: "letting the feeling settle before acting on it — a few minutes and some slow breaths can change the response." },
+  { key: "gratitude", label: "the good moments",
+    words: ["grateful", "thankful", "happy", "glad", "proud", "excited", "enjoyed", "accomplished", "relaxed", "calm", "love"],
+    tip: "pausing to savour it — noticing what made things good helps those moments stick." },
+];
+
+const CRISIS_WORDS = ["suicide", "suicidal", "kill myself", "want to die", "don't want to live", "dont want to live", "end it all", "hurt myself", "self-harm", "self harm", "harm myself"];
+const CRISIS_REPLY =
+  "I'm really glad you told me, and I'm sorry it's this heavy right now. This is bigger than I can hold for you — please reach out to someone who can: call or text 988 (US, Suicide & Crisis Lifeline) any time, or your local emergency number. You deserve support, and you don't have to face this alone.";
+
+const lower = (s) => (s || "").toLowerCase();
+const detectThemes = (text) => THEMES.filter((th) => th.words.some((w) => lower(text).includes(w)));
+const hasCrisis = (text) => CRISIS_WORDS.some((w) => lower(text).includes(w));
+const avg = (nums) => (nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null);
+
+// Journal notes plus any short check-in notes written in the last 7 days.
+function recentWriting() {
+  const since = todayKey(6);
+  const pad = (n) => String(n).padStart(2, "0");
+  const dayOf = (ts) => {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  };
+  const notes = loadNotes()
+    .filter((n) => n && n.text && dayOf(n.ts) >= since)
+    .map((n) => ({ day: dayOf(n.ts), text: n.text }));
+  const checkinNotes = loadEntries()
+    .filter((en) => en.date >= since && en.note)
+    .map((en) => ({ day: en.date, text: en.note }));
+  return [...notes, ...checkinNotes].sort((a, b) => a.day.localeCompare(b.day));
 }
 
-if (setupPanel && chatPanel && chatForm) {
-  document.getElementById("save-key").addEventListener("click", () => {
-    const keyInput = document.getElementById("gemini-key");
-    const key = keyInput.value.trim();
-    if (!key) {
-      keyInput.focus();
-      return;
-    }
-    localStorage.setItem(GEMINI_KEY, key);
-    keyInput.value = "";
-    renderAssistant();
-  });
+// The heart of the feature: advice drawn from the past week's writing + check-ins.
+function weeklyAdvice() {
+  const entries = loadEntries().filter((en) => en.date >= todayKey(6));
+  const writing = recentWriting();
 
-  document.getElementById("remove-key").addEventListener("click", () => {
-    localStorage.removeItem(GEMINI_KEY);
-    renderAssistant();
-  });
+  if (!entries.length && !writing.length) {
+    return "I don't see any check-ins or journal entries from the past week yet. Whenever you're ready, write a few lines on the Check-in page — even one sentence — and I'll reflect on it with you here.";
+  }
 
-  chatForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const input = document.getElementById("chat-input");
-    const sendBtn = e.target.querySelector('button[type="submit"]');
-    const text = input.value.trim();
-    if (!text || sendBtn.disabled) return;
+  const counts = {};
+  for (const w of writing)
+    for (const th of detectThemes(w.text)) counts[th.key] = (counts[th.key] || 0) + 1;
+  const ranked = THEMES.filter((th) => counts[th.key]).sort((a, b) => counts[b.key] - counts[a.key]);
 
-    sendBtn.disabled = true;
-    input.value = "";
-    addBubble("user", text);
-    chatHistory.push({ role: "user", parts: [{ text }] });
-    const pending = addBubble("assistant", "…");
+  const parts = [];
+  if (writing.length)
+    parts.push(`You wrote ${writing.length} ${writing.length === 1 ? "entry" : "entries"} this past week — putting things into words is its own small act of care.`);
+  else
+    parts.push("You've checked in a few times this week — that steady attention to how you're doing matters.");
 
-    try {
-      const res = await fetch(GEMINI_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": localStorage.getItem(GEMINI_KEY),
-        },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: assistantSystemPrompt() }] },
-          contents: chatHistory,
-        }),
-      });
+  const mood = avg(entries.map((e) => e.mood));
+  const sleep = avg(entries.map((e) => e.sleep));
+  const stress = avg(entries.map((e) => e.stress));
+  if (sleep !== null && sleep < 6.5)
+    parts.push(`Your sleep has averaged about ${sleep.toFixed(1)} hours — running short across a week tends to make everything feel heavier, so protecting rest is worth it.`);
+  else if (stress !== null && stress >= 6.5)
+    parts.push(`Your stress has sat high this week (around ${stress.toFixed(1)}/10) — that's a real load to be carrying.`);
+  else if (mood !== null && mood >= 4)
+    parts.push("Your mood has leaned brighter this week — it's worth noticing what's been going right.");
 
-      if (!res.ok) {
-        throw new Error(
-          res.status === 400 || res.status === 403
-            ? "That key didn't work — try removing it and saving a new one."
-            : `The assistant hit an error (${res.status}). Try again in a moment.`
-        );
-      }
+  if (ranked.length)
+    parts.push(`This week, ${ranked[0].label} came up more than once in what you wrote. One small thing that can help: ${ranked[0].tip}`);
+  else if (writing.length)
+    parts.push("If you'd like, tell me what's weighed on you most this week and we can think it through together.");
 
-      const data = await res.json();
-      const reply =
-        data.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ||
-        "Sorry — I couldn't come up with a response. Try again?";
-      pending.textContent = reply;
-      chatHistory.push({ role: "model", parts: [{ text: reply }] });
-    } catch (err) {
-      pending.textContent =
-        err instanceof TypeError
-          ? "Network error — check your connection and try again."
-          : err.message;
-      pending.classList.add("error");
-      chatHistory.pop(); // drop the failed turn so retries start clean
-    }
-    sendBtn.disabled = false;
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  });
+  return parts.join(" ");
+}
 
-  renderAssistant();
+function replyTo(text) {
+  if (hasCrisis(text)) return CRISIS_REPLY;
+  const themes = detectThemes(text);
+  if (themes.length) {
+    const th = themes[0];
+    if (th.key === "gratitude")
+      return "That's really good to hear — those brighter moments matter. It's worth pausing to notice what made it good, so it stays with you a little longer.";
+    return `I hear you — that's a real thing to be sitting with. Be gentle with yourself; one thing that sometimes helps is ${th.tip}`;
+  }
+  const openings = [
+    "Thank you for sharing that. What feels like the heaviest part of it right now?",
+    "I hear you. If it helps, what would feel like one small step toward feeling a little better today?",
+    "That makes sense. Would it help to talk through what's underneath it?",
+  ];
+  return openings[chatHistory.filter((m) => m.role === "user").length % openings.length];
 }
 
 function addBubble(role, text) {
@@ -575,24 +601,26 @@ function addBubble(role, text) {
   return div;
 }
 
-function assistantSystemPrompt() {
-  const last7 = loadEntries().filter((en) => en.date >= todayKey(6));
-  const summary = last7
-    .map(
-      (en) =>
-        `${en.date}: mood ${en.mood}/5, sleep ${en.sleep}h, energy ${en.energy}/10, stress ${en.stress}/10` +
-        (en.tags.length ? `, did: ${en.tags.join(", ")}` : "")
-    )
-    .join("\n");
+if (chatMessages && chatForm) {
+  // Open with advice grounded in the last week, instead of a static greeting.
+  chatMessages.innerHTML = "";
+  addBubble("assistant", weeklyAdvice());
 
-  return [
-    "You are the supportive companion inside Mindful, a personal mental health check-in website.",
-    "Be warm, brief (2–4 sentences), and encouraging. Listen first; offer at most one gentle, practical suggestion.",
-    "You are not a therapist and must not diagnose or give medical advice. If the user mentions self-harm, suicide, or crisis, gently urge them to call or text 988 (US) or contact local emergency services.",
-    summary
-      ? `The user's check-ins from the last 7 days:\n${summary}`
-      : "The user has no recent check-ins.",
-  ].join("\n\n");
+  chatForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = document.getElementById("chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    addBubble("user", text);
+    chatHistory.push({ role: "user", text });
+    const reply = replyTo(text);
+    addBubble("assistant", reply);
+    chatHistory.push({ role: "assistant", text: reply });
+  });
+
+  if (reflectBtn)
+    reflectBtn.addEventListener("click", () => addBubble("assistant", weeklyAdvice()));
 }
 
 // ---- Scroll transitions ----
