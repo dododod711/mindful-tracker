@@ -109,21 +109,55 @@
     <section id="resources" class="section">
       <div class="container">
         <h2 class="reveal reveal-up">Resources</h2>
+        <p class="resources-sub reveal reveal-up">A few small things you can do right now — most work right here on the page.</p>
         <div class="resource-grid">
+          <!-- Box-breathing pacer -->
           <div class="card resource-card reveal reveal-up">
             <h3>🫁 Box Breathing</h3>
-            <p>Breathe in for 4, hold for 4, out for 4, hold for 4. Repeat for a minute when stress climbs.</p>
+            <p>In for 4, hold for 4, out for 4, hold for 4 — follow the circle to ease the climb of stress.</p>
+            <div class="breath" id="breath">
+              <div class="breath-orb"><span class="breath-label" id="breath-label">Ready</span></div>
+            </div>
+            <button type="button" class="btn-ghost res-btn" id="breath-toggle">Start</button>
           </div>
+
+          <!-- 3 good things — saved privately in this browser -->
           <div class="card resource-card reveal reveal-up">
             <h3>📝 3 Good Things</h3>
-            <p>Each evening, jot down three things that went well today — however small.</p>
+            <p>Name three things that went well today — however small. Saved just for you, in this browser.</p>
+            <form class="good-things" id="good-things">
+              <input type="text" maxlength="80" placeholder="1 — something good…" aria-label="First good thing" />
+              <input type="text" maxlength="80" placeholder="2 — something good…" aria-label="Second good thing" />
+              <input type="text" maxlength="80" placeholder="3 — something good…" aria-label="Third good thing" />
+              <button type="submit" class="btn-ghost res-btn">Save</button>
+              <p class="good-saved" id="good-saved" hidden>Saved — nicely done. 🌱</p>
+            </form>
           </div>
+
+          <!-- 5-4-3-2-1 grounding stepper -->
+          <div class="card resource-card reveal reveal-up">
+            <h3>🌿 5-4-3-2-1 Grounding</h3>
+            <p>A quick way back to the present moment when things feel overwhelming.</p>
+            <p class="ground-step" id="ground-step">Tap start, then take your time with each one.</p>
+            <button type="button" class="btn-ghost res-btn" id="ground-btn">Start</button>
+          </div>
+
+          <!-- A kinder thought — cycles supportive reframes -->
+          <div class="card resource-card reveal reveal-up">
+            <h3>💭 A Kinder Thought</h3>
+            <p class="reframe-text" id="reframe-text">Feelings are visitors — they're allowed to come and go.</p>
+            <button type="button" class="btn-ghost res-btn" id="reframe-btn">Another</button>
+          </div>
+
+          <!-- Take a walk (info) -->
           <div class="card resource-card reveal reveal-up">
             <h3>🚶 Take a Walk</h3>
-            <p>Ten minutes outside can shift a tough day. No destination needed.</p>
+            <p>Ten minutes outside can shift a tough day. No destination needed — just a change of scene and some fresh air.</p>
           </div>
+
+          <!-- Crisis line (info) -->
           <div class="card resource-card reveal reveal-up">
-            <h3>🆘 Need to talk?</h3>
+            <h3>🆘 Need to Talk?</h3>
             <p>If you're struggling, you're not alone. In the US, call or text <strong>988</strong> (Suicide &amp; Crisis Lifeline), any time.</p>
           </div>
         </div>

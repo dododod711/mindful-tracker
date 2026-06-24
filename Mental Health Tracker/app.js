@@ -636,3 +636,107 @@ const revealObserver = new IntersectionObserver(
 );
 
 document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+// ---- Interactive resources (insights page) ----
+// Each widget only wires up when its elements are on the current page.
+
+// Box breathing: the orb animation is CSS; here we just narrate the phases.
+const breath = document.getElementById("breath");
+const breathToggle = document.getElementById("breath-toggle");
+if (breath && breathToggle) {
+  const breathLabel = document.getElementById("breath-label");
+  const phases = ["Breathe in", "Hold", "Breathe out", "Hold"];
+  let breathTimer = null;
+  breathToggle.addEventListener("click", () => {
+    if (breathTimer) {
+      clearInterval(breathTimer);
+      breathTimer = null;
+      breath.classList.remove("running");
+      breathLabel.textContent = "Ready";
+      breathToggle.textContent = "Start";
+      return;
+    }
+    breath.classList.add("running");
+    breathToggle.textContent = "Stop";
+    let i = 0;
+    breathLabel.textContent = phases[0];
+    breathTimer = setInterval(() => {
+      i = (i + 1) % phases.length;
+      breathLabel.textContent = phases[i];
+    }, 4000);
+  });
+}
+
+// 3 Good Things: saved privately in this browser, one set per day.
+const GOOD_KEY = "mindful-good-things";
+const goodForm = document.getElementById("good-things");
+if (goodForm) {
+  const goodSaved = document.getElementById("good-saved");
+  const goodInputs = [...goodForm.querySelectorAll("input")];
+  // Prefill today's, if it's already been written.
+  const todaysGood = loadFrom(GOOD_KEY).find((g) => g.date === todayKey());
+  if (todaysGood)
+    todaysGood.items.forEach((t, n) => {
+      if (goodInputs[n]) goodInputs[n].value = t;
+    });
+  goodForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const items = goodInputs.map((el) => el.value.trim()).filter(Boolean);
+    if (!items.length) {
+      goodInputs[0].focus();
+      return;
+    }
+    const all = loadFrom(GOOD_KEY).filter((g) => g.date !== todayKey());
+    all.push({ date: todayKey(), items });
+    localStorage.setItem(GOOD_KEY, JSON.stringify(all));
+    goodSaved.hidden = false;
+    setTimeout(() => (goodSaved.hidden = true), 2500);
+  });
+}
+
+// 5-4-3-2-1 grounding stepper.
+const groundBtn = document.getElementById("ground-btn");
+if (groundBtn) {
+  const groundStep = document.getElementById("ground-step");
+  const steps = [
+    "Name 5 things you can see 👀",
+    "Notice 4 things you can feel ✋",
+    "Listen for 3 things you can hear 👂",
+    "Find 2 things you can smell 👃",
+    "Name 1 thing you can taste 👅",
+    "Nicely done — notice how you feel now. 🌿",
+  ];
+  let step = -1;
+  groundBtn.addEventListener("click", () => {
+    step += 1;
+    if (step >= steps.length) {
+      step = -1;
+      groundStep.textContent = "Tap start, then take your time with each one.";
+      groundBtn.textContent = "Start";
+      return;
+    }
+    groundStep.textContent = steps[step];
+    groundBtn.textContent = step >= steps.length - 1 ? "Start over" : "Next";
+  });
+}
+
+// A kinder thought: cycle through gentle, supportive reframes.
+const reframeBtn = document.getElementById("reframe-btn");
+if (reframeBtn) {
+  const reframeText = document.getElementById("reframe-text");
+  const thoughts = [
+    "Feelings are visitors — they're allowed to come and go.",
+    "You've made it through every hard day so far. That's a real track record.",
+    "Rest is productive too — you don't have to earn it.",
+    "One small step still counts as moving forward.",
+    "You can be a work in progress and still be enough right now.",
+    "Asking for help is strength, not weakness.",
+    "This feeling is real, but it isn't permanent.",
+    "Be as kind to yourself as you'd be to a good friend.",
+  ];
+  let t = 0;
+  reframeBtn.addEventListener("click", () => {
+    t = (t + 1) % thoughts.length;
+    reframeText.textContent = thoughts[t];
+  });
+}
