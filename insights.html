@@ -17,8 +17,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Mindful" />
   <link rel="stylesheet" href="styles.css" />
+  <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
-<body>
+<body class="has-dotgrid">
+  <canvas id="dot-bg" class="dot-bg" aria-hidden="true"></canvas>
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html">
@@ -132,6 +134,7 @@
               <button type="submit" class="btn-ghost res-btn">Save</button>
               <p class="good-saved" id="good-saved" hidden>Saved — nicely done. 🌱</p>
             </form>
+            <ul class="good-list" id="good-list" hidden></ul>
           </div>
 
           <!-- 5-4-3-2-1 grounding stepper -->
@@ -195,6 +198,7 @@
     </div>
   </footer>
 
+  <script src="dotgrid.js"></script>
   <script src="app.js"></script>
   <script src="ui.js"></script>
   <script>

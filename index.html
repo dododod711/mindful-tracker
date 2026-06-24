@@ -17,8 +17,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Mindful" />
   <link rel="stylesheet" href="styles.css" />
+  <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
-<body>
+<body class="has-dotgrid">
+  <canvas id="dot-bg" class="dot-bg" aria-hidden="true"></canvas>
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html">
@@ -43,6 +45,7 @@
         <p id="streak-banner" class="streak-banner" hidden></p>
         <p class="home-cta reveal reveal-up">
           <a href="today.html#checkin" class="btn-primary">Start today's check-in</a>
+          <button type="button" id="tour-start" class="btn-ghost">✨ Take a tour</button>
         </p>
       </div>
     </section>
@@ -104,8 +107,10 @@
     </div>
   </footer>
 
+  <script src="dotgrid.js"></script>
   <script src="app.js"></script>
   <script src="ui.js"></script>
+  <script src="tour.js"></script>
   <script>
     if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
       navigator.serviceWorker.register("sw.js").catch(() => {});

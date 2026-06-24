@@ -5,7 +5,7 @@ description: Build, launch, screenshot, and drive the Mindful mental health trac
 
 # Run Mindful
 
-Mindful is a static **HTML/CSS/JS** app (`Mental Health Tracker/`) with a thin
+Mindful is a static **HTML/CSS/JS** app (web files at the repo root) with a thin
 **macOS WebKit wrapper** (`desktop/`). There is no bundler and no Node — pages
 are plain `<script>`/`<link>` files served over a custom `mindful://` scheme so
 `localStorage`, the service worker, and relative fetches behave like real https.
@@ -55,7 +55,7 @@ swift .claude/skills/run-mindful/driver.swift eval index.html \
 ```
 
 `WEB_ROOT=/some/dir` overrides which folder pages are served from (default: the
-`Mental Health Tracker/` source next to this skill).
+repo root four levels up from this skill, where the web files live).
 
 ## Build + smoke-test the macOS app
 
@@ -98,8 +98,8 @@ open desktop/dist/Mindful.app   # opens the real app window; useless over headle
   Neither is exercisable here (no camera, key, or — offline — network). The
   driver covers the DOM/UI layer; with no camera the scene falls back to cursor
   control. (MediaPipe *does* initialize inside WKWebView when online.)
-- **The source folder name has a space** (`Mental Health Tracker/`). `driver.swift`
-  and `desktop/build.sh` quote it; keep the quotes if you script around them.
+- **Web files live at the repo root** (served directly, so `index.html` deploys
+  with no Root Directory config). `desktop/build.sh` copies them from `../`.
 - **macOS only.** The wrapper uses AppKit/WebKit/`swiftc` and won't build on
   Linux. The web app itself is portable static files.
 

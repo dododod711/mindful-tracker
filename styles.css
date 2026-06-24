@@ -75,6 +75,171 @@ h3 {
   padding: 0 1.25rem;
 }
 
+/* Visible focus ring for keyboard users (mouse clicks stay clean) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ===== Interactive dot-grid background ===== */
+.dot-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: var(--bg);
+  pointer-events: none; /* clicks/hover pass through; dotgrid.js listens on window */
+  --dot-base: #d2ddca; /* soft sage on warm paper */
+  --dot-active: #4f7259; /* accent sage near the cursor */
+}
+
+@media (prefers-color-scheme: dark) {
+  .dot-bg {
+    --dot-base: #38473a;
+    --dot-active: #8caf91;
+  }
+}
+
+/* Pages with the grid go transparent so it shows behind every section; the
+   cards keep their own (slightly frosted) surface and float on top so the
+   boxes and the dots read as one calm layer. */
+body.has-dotgrid,
+.has-dotgrid .hero,
+.has-dotgrid .section-alt {
+  background: transparent;
+}
+
+.has-dotgrid .card {
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.home-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-cta .btn-ghost {
+  margin-top: 0;
+}
+
+/* ===== Tour / walkthrough overlay ===== */
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(20, 18, 28, 0.55);
+  backdrop-filter: blur(4px);
+  animation: tour-fade 0.25s ease;
+}
+
+.tour-overlay[hidden] {
+  display: none;
+}
+
+@keyframes tour-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tour-card {
+  position: relative;
+  width: min(440px, 100%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 1.9rem 1.8rem 1.6rem;
+  text-align: center;
+  animation: tour-pop 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes tour-pop {
+  from { transform: translateY(12px) scale(0.97); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.tour-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  border: none;
+  background: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.tour-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.3rem;
+}
+
+.tour-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.tour-dot.active {
+  background: var(--accent);
+  transform: scale(1.35);
+}
+
+.tour-dot.done {
+  background: var(--accent-soft);
+}
+
+.tour-icon {
+  font-size: 2.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.tour-title {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.tour-text {
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.tour-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+.tour-nav .btn-ghost {
+  margin-top: 0;
+}
+
+.tour-nav .tour-back:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 /* ===== Header ===== */
 .site-header {
   position: sticky;
@@ -1047,6 +1212,49 @@ textarea:focus {
 
 .good-saved[hidden] {
   display: none;
+}
+
+.good-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0.9rem 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.good-list[hidden] {
+  display: none;
+}
+
+.good-day .good-date {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  margin-bottom: 0.15rem;
+}
+
+.good-day ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.good-day ul li {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  padding-left: 0.9rem;
+  position: relative;
+}
+
+.good-day ul li::before {
+  content: "🌱";
+  position: absolute;
+  left: 0;
+  font-size: 0.7rem;
+  top: 0.15rem;
 }
 
 /* Grounding + reframe text */

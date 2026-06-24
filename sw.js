@@ -3,7 +3,10 @@
 // used on the Stargaze page) are left to the network so they still load online
 // and simply fall back when offline.
 
-const CACHE = "mindful-v1";
+// Bump this on every meaningful release. The activate handler wipes older
+// caches, and the network-first fetch handler (below) means returning users
+// get fresh files while online and still fall back to this cache offline.
+const CACHE = "mindful-v3";
 const ASSETS = [
   "./",
   "index.html",
@@ -16,6 +19,8 @@ const ASSETS = [
   "ui.js",
   "galaxy.js",
   "handtracking.js",
+  "dotgrid.js",
+  "tour.js",
   "manifest.webmanifest",
   "icons/icon-192.png",
   "icons/icon-512.png",
@@ -43,18 +48,18 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // let the CDN go straight to network
 
-  // Cache-first for the app shell; fall back to the cache offline.
+  // Network-first so a new deploy reaches returning users right away; refresh
+  // the cache on every successful fetch, and fall back to it (then the app
+  // shell) when offline.
   e.respondWith(
-    caches.match(req).then(
-      (hit) =>
-        hit ||
-        fetch(req)
-          .then((res) => {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-            return res;
-          })
-          .catch(() => caches.match("index.html"))
-    )
+    fetch(req)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
+        return res;
+      })
+      .catch(() =>
+        caches.match(req).then((hit) => hit || caches.match("index.html"))
+      )
   );
 });

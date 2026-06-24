@@ -39,8 +39,8 @@ let shotJS = args.count > 4 ? args[4] : ""
 let width = args.count > 5 ? Int(args[5]) ?? 1100 : 1100
 let height = args.count > 6 ? Int(args[6]) ?? 760 : 760
 
-// Web root: $WEB_ROOT, else the source folder four levels up from this script
-// (.claude/skills/run-mindful/driver.swift -> unit root -> "Mental Health Tracker").
+// Web root: $WEB_ROOT, else the unit root four levels up from this script
+// (.claude/skills/run-mindful/driver.swift -> unit root), where the web app lives.
 let webRoot: URL = {
     if let env = ProcessInfo.processInfo.environment["WEB_ROOT"] {
         return URL(fileURLWithPath: env)
@@ -50,7 +50,7 @@ let webRoot: URL = {
         .deletingLastPathComponent()   // skills
         .deletingLastPathComponent()   // .claude
         .deletingLastPathComponent()   // unit root
-    return unit.appendingPathComponent("Mental Health Tracker")
+    return unit
 }()
 
 final class SchemeHandler: NSObject, WKURLSchemeHandler {

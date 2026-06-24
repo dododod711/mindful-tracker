@@ -10,20 +10,22 @@ mkdir -p build "$APP/Contents/MacOS" "$APP/Contents/Resources/web"
 
 swiftc -O -o "$APP/Contents/MacOS/Mindful" main.swift
 cp Info.plist "$APP/Contents/"
-cp "../Mental Health Tracker/index.html" \
-   "../Mental Health Tracker/today.html" \
-   "../Mental Health Tracker/insights.html" \
-   "../Mental Health Tracker/galaxy.html" \
-   "../Mental Health Tracker/styles.css" \
-   "../Mental Health Tracker/galaxy.css" \
-   "../Mental Health Tracker/app.js" \
-   "../Mental Health Tracker/ui.js" \
-   "../Mental Health Tracker/galaxy.js" \
-   "../Mental Health Tracker/handtracking.js" \
-   "../Mental Health Tracker/manifest.webmanifest" \
-   "../Mental Health Tracker/sw.js" \
+cp "../index.html" \
+   "../today.html" \
+   "../insights.html" \
+   "../galaxy.html" \
+   "../styles.css" \
+   "../galaxy.css" \
+   "../app.js" \
+   "../ui.js" \
+   "../galaxy.js" \
+   "../handtracking.js" \
+   "../dotgrid.js" \
+   "../tour.js" \
+   "../manifest.webmanifest" \
+   "../sw.js" \
    "$APP/Contents/Resources/web/"
-cp -R "../Mental Health Tracker/icons" "$APP/Contents/Resources/web/"
+cp -R "../icons" "$APP/Contents/Resources/web/"
 
 if swift makeicon.swift build/icon_1024.png; then
   mkdir -p build/Mindful.iconset

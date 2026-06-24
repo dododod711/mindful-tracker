@@ -626,16 +626,20 @@ if (chatMessages && chatForm) {
 // ---- Scroll transitions ----
 // Sections slide in when they enter the viewport and slide back out
 // when they leave, each in the direction set by their reveal-* class.
-const revealObserver = new IntersectionObserver(
-  (observed) => {
-    for (const { target, isIntersecting } of observed) {
-      target.classList.toggle("visible", isIntersecting);
-    }
-  },
-  { threshold: 0.15 }
-);
-
-document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (observed) => {
+      for (const { target, isIntersecting } of observed) {
+        target.classList.toggle("visible", isIntersecting);
+      }
+    },
+    { threshold: 0.15 }
+  );
+  document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+} else {
+  // No observer support — reveal everything so content is never stuck hidden.
+  document.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
+}
 
 // ---- Interactive resources (insights page) ----
 // Each widget only wires up when its elements are on the current page.
@@ -672,13 +676,49 @@ const GOOD_KEY = "mindful-good-things";
 const goodForm = document.getElementById("good-things");
 if (goodForm) {
   const goodSaved = document.getElementById("good-saved");
+  const goodList = document.getElementById("good-list");
   const goodInputs = [...goodForm.querySelectorAll("input")];
+
+  // Show the last few days back to the user — user text via textContent only.
+  function renderGoodList() {
+    if (!goodList) return;
+    const days = loadFrom(GOOD_KEY)
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 5);
+    goodList.hidden = days.length === 0;
+    goodList.innerHTML = "";
+    for (const g of days) {
+      const dayLi = document.createElement("li");
+      dayLi.className = "good-day";
+      const date = document.createElement("span");
+      date.className = "good-date";
+      date.textContent =
+        g.date === todayKey()
+          ? "Today"
+          : new Date(g.date + "T12:00:00").toLocaleDateString(undefined, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            });
+      const items = document.createElement("ul");
+      for (const t of g.items) {
+        const itemLi = document.createElement("li");
+        itemLi.textContent = t;
+        items.appendChild(itemLi);
+      }
+      dayLi.append(date, items);
+      goodList.appendChild(dayLi);
+    }
+  }
+
   // Prefill today's, if it's already been written.
   const todaysGood = loadFrom(GOOD_KEY).find((g) => g.date === todayKey());
   if (todaysGood)
     todaysGood.items.forEach((t, n) => {
       if (goodInputs[n]) goodInputs[n].value = t;
     });
+  renderGoodList();
+
   goodForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const items = goodInputs.map((el) => el.value.trim()).filter(Boolean);
@@ -691,6 +731,7 @@ if (goodForm) {
     localStorage.setItem(GOOD_KEY, JSON.stringify(all));
     goodSaved.hidden = false;
     setTimeout(() => (goodSaved.hidden = true), 2500);
+    renderGoodList();
   });
 }
 
