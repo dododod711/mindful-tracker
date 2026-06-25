@@ -1,4 +1,4 @@
-// ===== Mindful — Mental Health Tracker =====
+// ===== Lumen — Mental Health Tracker =====
 // All data is stored locally in the browser via localStorage.
 //
 // This script loads on both pages (Check-in/Journal and Insights). The two
@@ -153,7 +153,7 @@ if (importBtn && importFile) {
       render();
       alert("Backup imported.");
     } catch {
-      alert("That file doesn't look like a Mindful backup.");
+      alert("That file doesn't look like a Lumen backup.");
     }
     importFile.value = "";
   });

@@ -276,6 +276,13 @@ body.has-dotgrid,
   color: var(--accent-dark);
 }
 
+.brand-mark {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: block;
+  flex: none;
+}
+
 .site-nav {
   display: flex;
   gap: 1.25rem;

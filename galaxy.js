@@ -1,4 +1,4 @@
-// ===== Mindful — Stargazing =====
+// ===== Lumen — Stargazing =====
 // A calm spiral galaxy you steer with gentle movement. Motion comes from the
 // camera (frame differencing, computed locally — no video ever leaves the
 // device) or, as a fallback, the pointer / device tilt. Special "feature"
@@ -35,7 +35,7 @@ const BODIES = [
 ];
 
 const CAT_COLOR = { mind: "#5fd0c0", psych: "#9b8cff", res: "#f0b27a", you: "#f2a0c0" };
-const CAT_LABEL = { mind: "Mindfulness", psych: "Psychology", res: "Resource", you: "Your journal" };
+const CAT_LABEL = { mind: "Lumenness", psych: "Psychology", res: "Resource", you: "Your journal" };
 
 // The user's own journal entries (written on the Check-in page) become stars
 // too. Read from the same localStorage key the rest of the app uses.
@@ -246,10 +246,10 @@ async function startCamera() {
   // Prefer real hand tracking; fall back to frame-difference motion if the
   // MediaPipe model can't load (offline) or the device can't run it.
   handMode = false;
-  if (window.MindfulHands) {
+  if (window.LumenHands) {
     setStatus("Loading hand tracking…");
     try {
-      handMode = await window.MindfulHands.start(cam, {
+      handMode = await window.LumenHands.start(cam, {
         onPan: (x, y) => { look.tx = x; look.ty = y; },
         onZoom: (z) => setZoom(z),
         onPinch: (nx, ny) => {       // normalized, already mirrored
@@ -274,7 +274,7 @@ async function startCamera() {
 
 function stopCamera() {
   cameraOn = false;
-  if (window.MindfulHands) window.MindfulHands.stop();
+  if (window.LumenHands) window.LumenHands.stop();
   handMode = false;
   clearInterval(motionTimer);
   if (stream) stream.getTracks().forEach((t) => t.stop());

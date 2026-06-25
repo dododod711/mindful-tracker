@@ -1,4 +1,4 @@
-# Mindful — Mental Health Tracker
+# Lumen — Mental Health Tracker
 
 A free, no-account daily mental health check-in that runs entirely in the browser.
 

@@ -1,11 +1,11 @@
-// Mindful — native macOS shell around the Mental Health Tracker web app.
+// Lumen — native macOS shell around the Mental Health Tracker web app.
 // Serves the bundled web files over a custom scheme (mindful://localhost) so
 // localStorage gets a stable origin and persists across launches.
 
 import Cocoa
 import WebKit
 
-private let appName = "Mindful"
+private let appName = "Lumen"
 private let appScheme = "mindful"
 private let startURL = URL(string: "\(appScheme)://localhost/index.html")!
 
@@ -99,7 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         window.minSize = NSSize(width: 640, height: 480)
         window.contentView = webView
         window.center()
-        window.setFrameAutosaveName("MindfulMainWindow")
+        window.setFrameAutosaveName("LumenMainWindow")
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 

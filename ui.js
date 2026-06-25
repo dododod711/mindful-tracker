@@ -1,4 +1,4 @@
-// ===== Mindful — small UI helpers =====
+// ===== Lumen — small UI helpers =====
 // Keeps each slider's --fill custom prop in sync so the track shows a
 // sage fill up to the current value. Purely decorative.
 

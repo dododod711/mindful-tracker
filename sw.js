@@ -1,4 +1,4 @@
-// Mindful — service worker. Precaches the app shell so the whole thing works
+// Lumen — service worker. Precaches the app shell so the whole thing works
 // offline and installs as a PWA. Cross-origin requests (e.g. the MediaPipe CDN
 // used on the Stargaze page) are left to the network so they still load online
 // and simply fall back when offline.
@@ -6,7 +6,7 @@
 // Bump this on every meaningful release. The activate handler wipes older
 // caches, and the network-first fetch handler (below) means returning users
 // get fresh files while online and still fall back to this cache offline.
-const CACHE = "mindful-v4";
+const CACHE = "mindful-v5";
 const ASSETS = [
   "./",
   "index.html",
@@ -15,6 +15,7 @@ const ASSETS = [
   "galaxy.html",
   "styles.css",
   "galaxy.css",
+  "icon.svg",
   "app.js",
   "ui.js",
   "galaxy.js",

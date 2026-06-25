@@ -1,4 +1,4 @@
-// ===== Mindful — Hand tracking =====
+// ===== Lumen — Hand tracking =====
 // Real hand tracking via MediaPipe Tasks Vision (HandLandmarker): 21 landmarks
 // per hand, up to two hands, running in-browser on WASM/GPU. Loaded lazily from
 // CDN the first time the camera starts, so the page costs nothing until used and
@@ -11,7 +11,7 @@
 //   • Named landmark constants; structured gesture state, not raw tuples.
 //   • Every MediaPipe call wrapped so a missing hand can't crash the loop.
 
-window.MindfulHands = (function () {
+window.LumenHands = (function () {
   "use strict";
 
   // MediaPipe's 21-point model.
@@ -99,7 +99,7 @@ window.MindfulHands = (function () {
     try {
       vision = await import(/* webpackIgnore: true */ CDN);
     } catch (e) {
-      console.warn("MindfulHands: could not load MediaPipe —", e && e.message);
+      console.warn("LumenHands: could not load MediaPipe —", e && e.message);
       return false;
     }
     const fileset = await vision.FilesetResolver.forVisionTasks(WASM);
@@ -113,7 +113,7 @@ window.MindfulHands = (function () {
         });
         return true;
       } catch (e) {
-        console.warn(`MindfulHands: ${delegate} delegate failed —`, e && e.message);
+        console.warn(`LumenHands: ${delegate} delegate failed —`, e && e.message);
       }
     }
     return false;

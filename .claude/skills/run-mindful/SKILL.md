@@ -1,11 +1,11 @@
 ---
 name: run-mindful
-description: Build, launch, screenshot, and drive the Mindful mental health tracker (mentaltracker) — a static HTML/CSS/JS web app with a macOS WebKit wrapper. Use when asked to run, start, build, screenshot, smoke-test, or drive the Mindful / mental health tracker / stargaze app.
+description: Build, launch, screenshot, and drive the Lumen mental health tracker (mentaltracker) — a static HTML/CSS/JS web app with a macOS WebKit wrapper. Use when asked to run, start, build, screenshot, smoke-test, or drive the Lumen / mental health tracker / stargaze app.
 ---
 
-# Run Mindful
+# Run Lumen
 
-Mindful is a static **HTML/CSS/JS** app (web files at the repo root) with a thin
+Lumen is a static **HTML/CSS/JS** app (web files at the repo root) with a thin
 **macOS WebKit wrapper** (`desktop/`). There is no bundler and no Node — pages
 are plain `<script>`/`<link>` files served over a custom `mindful://` scheme so
 `localStorage`, the service worker, and relative fetches behave like real https.
@@ -60,11 +60,11 @@ repo root four levels up from this skill, where the web files live).
 ## Build + smoke-test the macOS app
 
 ```bash
-bash desktop/build.sh        # -> desktop/dist/Mindful.app  (prints "Built ...")
+bash desktop/build.sh        # -> desktop/dist/Lumen.app  (prints "Built ...")
 
 # Headless smoke test: loads each page in the built app, checks storage + JS errors.
 for p in index today insights galaxy; do
-  printf "%-9s " "$p:"; ./desktop/dist/Mindful.app/Contents/MacOS/Mindful --selftest --page $p.html
+  printf "%-9s " "$p:"; ./desktop/dist/Lumen.app/Contents/MacOS/Lumen --selftest --page $p.html
 done
 # Each prints e.g.:  storage=ok title=... sections=3 cards=3 media=true jserr=none
 # jserr=none is the pass signal. (galaxy reports sections=0 cards=0 — expected, it's a canvas page.)
@@ -73,7 +73,7 @@ done
 ## Run — human path
 
 ```bash
-open desktop/dist/Mindful.app   # opens the real app window; useless over headless/SSH
+open desktop/dist/Lumen.app   # opens the real app window; useless over headless/SSH
 ```
 
 ## Gotchas
@@ -108,7 +108,7 @@ open desktop/dist/Mindful.app   # opens the real app window; useless over headle
 - `swift: command not found` → install the Xcode CLT: `xcode-select --install`.
 - **Blank/empty screenshot** → reveals weren't forced; add the
   `.reveal → .visible` JS (see Gotchas). For `galaxy.html`, dismiss `#intro`.
-- **`open desktop/dist/Mindful.app` shows nothing** → it's a GUI launch; over
+- **`open desktop/dist/Lumen.app` shows nothing** → it's a GUI launch; over
   headless/SSH use the driver or `--selftest` instead.
 - Editing `driver.swift`: `mode`, `page`, `arg3`, `shotJS` are **top-level
   globals**, not members of `Delegate` — reference them directly (no `self.`).

@@ -4,8 +4,8 @@
 (function () {
   const steps = [
     {
-      icon: "🌿",
-      title: "Welcome to Mindful",
+      icon: "✨",
+      title: "Welcome to Lumen",
       text: "A calm, private space to check in with how you're doing. Here's a quick tour — you can skip it anytime.",
     },
     {

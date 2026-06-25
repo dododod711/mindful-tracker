@@ -1,6 +1,6 @@
-// Mindful run-driver — headless WebKit harness for the web app.
+// Lumen run-driver — headless WebKit harness for the web app.
 //
-// Mindful is a static HTML/CSS/JS app that the macOS wrapper serves over a
+// Lumen is a static HTML/CSS/JS app that the macOS wrapper serves over a
 // custom `mindful://` scheme (so localStorage, the service worker, and relative
 // fetches all behave like real https). This driver does the same thing from the
 // command line using WKWebView — the same engine the shipped app uses — so an
