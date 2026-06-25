@@ -20,7 +20,7 @@ cp "../index.html" \
    "../ui.js" \
    "../galaxy.js" \
    "../handtracking.js" \
-   "../dotgrid.js" \
+   "../iridescence.js" \
    "../tour.js" \
    "../manifest.webmanifest" \
    "../sw.js" \

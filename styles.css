@@ -82,29 +82,31 @@ h3 {
   border-radius: 4px;
 }
 
-/* ===== Interactive dot-grid background ===== */
+/* ===== Animated iridescence background ===== */
+/* iridescence.js renders a full-screen WebGL shader into this canvas. */
 .dot-bg {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
+  z-index: -2;
+  background: var(--bg); /* fallback if WebGL is unavailable */
+  pointer-events: none;
+}
+
+/* A soft veil of the page colour sits over the animation so text stays
+   readable while the iridescence still shows through. */
+body.has-dotgrid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
   z-index: -1;
-  background: var(--bg);
-  pointer-events: none; /* clicks/hover pass through; dotgrid.js listens on window */
-  --dot-base: #d2ddca; /* soft sage on warm paper */
-  --dot-active: #4f7259; /* accent sage near the cursor */
+  pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 48%, transparent);
 }
 
-@media (prefers-color-scheme: dark) {
-  .dot-bg {
-    --dot-base: #38473a;
-    --dot-active: #8caf91;
-  }
-}
-
-/* Pages with the grid go transparent so it shows behind every section; the
-   cards keep their own (slightly frosted) surface and float on top so the
-   boxes and the dots read as one calm layer. */
+/* Pages with the background go transparent so it shows behind every section;
+   the cards keep their own frosted surface and float on top. */
 body.has-dotgrid,
 .has-dotgrid .hero,
 .has-dotgrid .section-alt {
@@ -112,9 +114,9 @@ body.has-dotgrid,
 }
 
 .has-dotgrid .card {
-  background: color-mix(in srgb, var(--card) 90%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .home-cta {
