@@ -672,7 +672,7 @@ const breathPhaseEl = document.getElementById("breath-phase");
 breatheBtn.addEventListener("click", () => {
   breath.active = !breath.active;
   breath.t0 = t;
-  breatheBtn.textContent = breath.active ? "◼ Stop" : "🫁 Breathe";
+  breatheBtn.textContent = breath.active ? "◼ Stop" : "◯ Breathe";
   breathCue.hidden = !breath.active;
   if (breath.active) setStatus("Box breathing · in 4 · hold 4 · out 4 · hold 4");
 });

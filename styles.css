@@ -1732,3 +1732,42 @@ textarea:focus {
   vertical-align: -0.18em;
   color: var(--accent-dark);
 }
+
+/* Leading icons on buttons, labels and status lines */
+#tour-start .ic,
+.home-privacy .ic,
+.btn-new-entry .ic,
+#letter-toggle .ic,
+#reflect-week .ic,
+.otd-label .ic,
+.save-msg .ic,
+.letter-meta .ic,
+.letters-sealed .ic,
+.streak-banner .ic {
+  margin-right: 0.4em;
+  vertical-align: -0.18em;
+}
+
+/* Disclaimer heading icon echoes the gold accent border */
+.disclaimer h2 .ic {
+  width: 1.15em;
+  height: 1.15em;
+  margin-right: 0.4em;
+  vertical-align: -0.2em;
+  color: #c9a45c;
+}
+
+/* Microphone buttons */
+.mic-btn .ic {
+  width: 1.25rem;
+  height: 1.25rem;
+  vertical-align: 0;
+}
+
+/* Tour step icons */
+.tour-icon .ic {
+  width: 2rem;
+  height: 2rem;
+  color: var(--accent);
+  vertical-align: -0.1em;
+}

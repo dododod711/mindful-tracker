@@ -2,29 +2,36 @@
 // Reactbits <Stepper>: clickable step indicators, Back/Next navigation, and a
 // final "Done". Opens from the "Take a tour" button, and once on a first visit.
 (function () {
+  const ICON = {
+    spark: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.5 4 1.5 5 6 6-4.5 1-5.5 2-6 6-.5-4-1.5-5-6-6 4.5-1 5.5-2 6-6z"/></svg>',
+    pencil: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    chart: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5v14h16"/><path d="M7 14l3.5-4 3 2L20 6"/></svg>',
+    planet: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><ellipse cx="12" cy="12" rx="10" ry="3.6" transform="rotate(-25 12 12)"/></svg>',
+    lock: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  };
   const steps = [
     {
-      icon: "✨",
+      icon: ICON.spark,
       title: "Welcome to Lumen",
       text: "A calm, private space to check in with how you're doing. Here's a quick tour — you can skip it anytime.",
     },
     {
-      icon: "📝",
+      icon: ICON.pencil,
       title: "Check-in & Journal",
       text: "Log your mood, sleep, energy and stress in seconds, then journal freely. One entry per day, saved right on your device.",
     },
     {
-      icon: "📈",
+      icon: ICON.chart,
       title: "Insights & Support",
       text: "See your weekly trends, get gentle advice drawn from your own journal, and try calming tools like box breathing and 5-4-3-2-1 grounding.",
     },
     {
-      icon: "🪐",
+      icon: ICON.planet,
       title: "Stargaze",
       text: "Your notes become a slowly breathing planet of stars you can steer with your hand or cursor — a moment to slow down and reset.",
     },
     {
-      icon: "🔒",
+      icon: ICON.lock,
       title: "Private by default",
       text: "Everything lives in this browser. No account, nothing leaves your device — and you can export a backup whenever you like.",
     },
@@ -83,7 +90,7 @@
 
   function render() {
     const s = steps[current];
-    iconEl.textContent = s.icon;
+    iconEl.innerHTML = s.icon;
     titleEl.textContent = s.title;
     textEl.textContent = s.text;
     backBtn.disabled = current === 0;

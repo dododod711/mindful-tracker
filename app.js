@@ -23,6 +23,10 @@ const ICON = {
   sleep: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.3 6.3 0 0 0 20 14.5z"/></svg>',
   energy: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
   stress: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>',
+  streak: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 4 6 6 6 10a6 6 0 0 1-12 0c0-1.8.8-3 2-4 .3 1.4 1 2 2 2 0-2.5-1-4 2-8z"/></svg>',
+  note: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 16h4"/></svg>',
+  letterOpen: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10l9 6 9-6"/></svg>',
+  lock: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
 };
 
 // ---- Storage helpers ----
@@ -389,7 +393,7 @@ function renderStreakBanner(entries) {
   if (!banner) return;
   const streak = currentStreak(entries);
   banner.hidden = streak < 2;
-  banner.textContent = `🔥 ${streak}-day check-in streak`;
+  banner.innerHTML = `${ICON.streak} ${streak}-day check-in streak`;
 }
 
 function renderJournal(entries) {
@@ -456,7 +460,7 @@ function renderJournal(entries) {
 
       el.innerHTML = `
         <div class="entry-head">
-          <span class="entry-mood">📝</span>
+          <span class="entry-mood">${ICON.note}</span>
           <span class="entry-date">${when}</span>
           <span class="entry-meta">${time} · <button class="entry-delete" data-id="${note.id}">delete</button></span>
         </div>
@@ -761,12 +765,12 @@ const groundBtn = document.getElementById("ground-btn");
 if (groundBtn) {
   const groundStep = document.getElementById("ground-step");
   const steps = [
-    "Name 5 things you can see 👀",
-    "Notice 4 things you can feel ✋",
-    "Listen for 3 things you can hear 👂",
-    "Find 2 things you can smell 👃",
-    "Name 1 thing you can taste 👅",
-    "Nicely done — notice how you feel now. 🌿",
+    "Name 5 things you can see",
+    "Notice 4 things you can feel",
+    "Listen for 3 things you can hear",
+    "Find 2 things you can smell",
+    "Name 1 thing you can taste",
+    "Nicely done — notice how you feel now.",
   ];
   let step = -1;
   groundBtn.addEventListener("click", () => {
@@ -953,7 +957,7 @@ function renderLetters() {
     card.className = "letter-card";
     const meta = document.createElement("p");
     meta.className = "letter-meta";
-    meta.textContent = `📬 A letter you wrote ${friendlyDate(l.created)}`;
+    meta.innerHTML = `${ICON.letterOpen} A letter you wrote ${friendlyDate(l.created)}`;
     const body = document.createElement("p");
     body.className = "letter-text";
     body.textContent = l.text;
@@ -968,7 +972,7 @@ function renderLetters() {
   if (sealedEl) {
     sealedEl.hidden = sealed.length === 0;
     if (sealed.length)
-      sealedEl.textContent = `🔒 ${sealed.length} sealed — next opens ${friendlyDate(sealed[0].deliverOn)}.`;
+      sealedEl.innerHTML = `${ICON.lock} ${sealed.length} sealed — next opens ${friendlyDate(sealed[0].deliverOn)}.`;
   }
 }
 
