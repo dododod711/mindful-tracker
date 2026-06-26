@@ -256,6 +256,15 @@ body.has-dotgrid,
   border-bottom: 1px solid var(--border);
 }
 
+/* On the aurora pages the header blends into the background: a faint frosted
+   strip that shows the iridescence through it, matching the tinted cards. */
+.has-dotgrid .site-header {
+  background: color-mix(in srgb, var(--bg) 34%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom-color: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
 .header-inner {
   display: flex;
   align-items: center;
