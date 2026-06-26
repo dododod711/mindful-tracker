@@ -1446,3 +1446,160 @@ textarea:focus {
     max-width: 92%;
   }
 }
+
+/* ===== Reflection features ===== */
+
+/* Adaptive journal prompt inside the composer */
+.composer-prompt-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.composer-prompt {
+  flex: 1;
+  margin: 0;
+  font-style: italic;
+  color: var(--accent-dark);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.prompt-shuffle {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.3s ease;
+}
+
+.prompt-shuffle:hover {
+  background: var(--accent-soft);
+  transform: rotate(180deg);
+}
+
+/* "On this day" resurfaced entry */
+.on-this-day {
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--accent);
+}
+
+.on-this-day[hidden] {
+  display: none;
+}
+
+.otd-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  margin-bottom: 0.4rem;
+}
+
+.otd-text {
+  color: var(--ink-soft);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Letters to your future self */
+.letters-block {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border);
+}
+
+.letters-block h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+}
+
+.letters-intro {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  margin-bottom: 0.9rem;
+}
+
+.letters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.letter-card {
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+}
+
+.letter-meta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  margin-bottom: 0.35rem;
+}
+
+.letter-text {
+  color: var(--ink);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.letters-sealed {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.8rem;
+}
+
+.letters-sealed[hidden] {
+  display: none;
+}
+
+.letter-composer[hidden] {
+  display: none;
+}
+
+.letter-composer label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.letter-composer textarea {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  font-size: 1rem;
+  background: var(--field);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.letter-when {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.85rem 0;
+}
+
+.letter-when label {
+  margin: 0;
+}
+
+.letter-date {
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  background: var(--field);
+  color: var(--ink);
+}

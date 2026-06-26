@@ -123,8 +123,16 @@
         <!-- Journal — right below the check-in, for longer thoughts -->
         <div id="journal" class="journal-block">
           <h2 class="reveal reveal-left">Journal</h2>
+          <div id="on-this-day" class="card on-this-day" hidden>
+            <p class="otd-label">🕰️ From your journal · <span class="otd-when"></span></p>
+            <p class="otd-text"></p>
+          </div>
           <button id="new-entry-btn" class="btn-primary btn-new-entry reveal reveal-left">✏️ New entry</button>
           <div id="composer" class="card composer" hidden>
+            <div class="composer-prompt-row">
+              <p class="composer-prompt" id="journal-prompt" title="Tap to start with this prompt"></p>
+              <button type="button" id="prompt-shuffle" class="prompt-shuffle" aria-label="Suggest another prompt">↻</button>
+            </div>
             <label for="journal-text">Write freely</label>
             <textarea id="journal-text" rows="5" placeholder="What's on your mind right now?"></textarea>
             <div class="composer-actions">
@@ -135,6 +143,29 @@
           <div id="entries" class="entries reveal reveal-left">
             <p class="empty-state">No entries yet — your saved check-ins will appear here.</p>
           </div>
+
+          <!-- Letters to your future self -->
+          <div id="letters" class="letters-block reveal reveal-left">
+            <h3>Letters to your future self</h3>
+            <p class="letters-intro">Write a note across time — sealed until a day you choose.</p>
+            <div id="letters-list" class="letters-list"></div>
+            <p id="letters-sealed" class="letters-sealed" hidden></p>
+            <button type="button" id="letter-toggle" class="btn-ghost">✉️ Write a letter</button>
+            <div id="letter-composer" class="card letter-composer" hidden>
+              <label for="letter-text">Dear future me…</label>
+              <textarea id="letter-text" rows="5" placeholder="What do you want your future self to know or remember?"></textarea>
+              <div class="letter-when">
+                <label for="letter-date">Open it on</label>
+                <input type="date" id="letter-date" class="letter-date" />
+              </div>
+              <div class="composer-actions">
+                <button type="button" id="letter-save" class="btn-primary">Seal it</button>
+                <button type="button" id="letter-cancel" class="btn-ghost">Cancel</button>
+              </div>
+              <p id="letter-saved" class="save-msg" role="status" hidden>Sealed. It'll be here when the day comes. 💌</p>
+            </div>
+          </div>
+
           <div class="data-actions">
             <button id="export-data" class="btn-ghost" hidden>Export backup</button>
             <button id="import-data" class="btn-ghost">Import backup</button>

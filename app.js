@@ -182,6 +182,9 @@ function render() {
   renderJournal(entries);
   renderStreakBanner(entries);
   updateCheckinButton(entries);
+  renderOnThisDay();
+  renderLetters();
+  renderWordPatterns(entries);
 }
 
 // ---- Patterns: plain-language observations from the check-in data ----
@@ -471,7 +474,8 @@ if (entriesList) {
 }
 
 prefillCheckinForm();
-render();
+// Initial render runs at the very end of this file, once every helper
+// (including the theme engine below) has been defined.
 
 // ---- On-device assistant (insights page) ----
 // A supportive companion that reflects on the last 7 days of journal entries
@@ -781,3 +785,259 @@ if (reframeBtn) {
     reframeText.textContent = thoughts[t];
   });
 }
+
+// =====================================================================
+//  Reflection features — what sets Lumen apart from a plain journal:
+//  adaptive prompts, "on this day", future-self letters, and patterns
+//  that connect your words to your mood. All on-device.
+// =====================================================================
+
+// ---- Adaptive journal prompts (check-in page) ----
+// The blank page becomes a gentle prompt chosen from the most recent check-in.
+const JOURNAL_PROMPTS = {
+  low: [
+    "What feels heaviest right now — and what would you say to a friend feeling this way?",
+    "Name the hardest part of today. What might ease it, even a little?",
+    "Where do you feel this in your body? What is it asking for?",
+  ],
+  stress: [
+    "What's one thing in your control today, and one thing you can set down?",
+    "Empty your head here — list everything on your mind, no order needed.",
+    "If today only had room for one thing, what would matter most?",
+  ],
+  tired: [
+    "What drained you today, and what would real rest look like tonight?",
+    "What's one thing you can let be 'good enough' right now?",
+    "When did you last feel rested? What was different then?",
+  ],
+  good: [
+    "What went right today? What made it good?",
+    "Who or what are you grateful for right now, and why?",
+    "Capture this — what would you want to remember about today?",
+  ],
+  neutral: [
+    "What's been on your mind today?",
+    "Describe today in three honest sentences.",
+    "What's something you're looking forward to, however small?",
+    "What did you need today — did you get it?",
+  ],
+};
+
+function latestEntry() {
+  return loadEntries().slice().sort((a, b) => b.date.localeCompare(a.date))[0] || null;
+}
+
+function promptCategory() {
+  const e = latestEntry();
+  if (!e) return "neutral";
+  if (e.mood <= 2) return "low";
+  if (e.stress >= 7) return "stress";
+  if (e.energy <= 3) return "tired";
+  if (e.mood >= 4) return "good";
+  return "neutral";
+}
+
+const pickJournalPrompt = () => {
+  const arr = JOURNAL_PROMPTS[promptCategory()];
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+const journalPromptEl = document.getElementById("journal-prompt");
+if (journalPromptEl && newEntryBtn && composer) {
+  const setPrompt = () => (journalPromptEl.textContent = pickJournalPrompt());
+  setPrompt();
+  newEntryBtn.addEventListener("click", () => {
+    if (!composer.hidden) setPrompt();
+  });
+  const shuffle = document.getElementById("prompt-shuffle");
+  if (shuffle) shuffle.addEventListener("click", setPrompt);
+  // Tapping the prompt drops it in as a starting line.
+  journalPromptEl.addEventListener("click", () => {
+    if (!composer.hidden && !composerText.value.trim()) {
+      composerText.value = journalPromptEl.textContent + "\n\n";
+      composerText.focus();
+    }
+  });
+}
+
+// ---- Date helpers shared by the reflection features ----
+const dayKeyOf = (ts) => {
+  const d = new Date(ts);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+function daysBetweenTodayAnd(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  const then = new Date(y, m - 1, d);
+  const now = new Date();
+  then.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  return Math.round((now - then) / 86400000);
+}
+
+function relativeWhen(days) {
+  if (days >= 330) return "about a year ago";
+  if (days >= 25) return `about ${Math.round(days / 30)} month${days >= 45 ? "s" : ""} ago`;
+  if (days >= 13) return `${Math.round(days / 7)} weeks ago`;
+  if (days >= 6) return "a week ago";
+  return `${days} days ago`;
+}
+
+const friendlyDate = (s) => {
+  const d = s.length === 10 ? new Date(s + "T12:00:00") : new Date(s);
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+};
+
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// ---- "On this day" — resurface a past journal entry (check-in page) ----
+function renderOnThisDay() {
+  const box = document.getElementById("on-this-day");
+  if (!box) return;
+  const notes = loadNotes().filter((n) => n && n.text);
+  let pick = null;
+  // Prefer an entry from a round number of days ago…
+  for (const days of [7, 30, 90, 180, 365]) {
+    const hit = notes.find((n) => dayKeyOf(n.ts) === todayKey(days));
+    if (hit) { pick = { note: hit, days }; break; }
+  }
+  // …otherwise the oldest entry that's at least a week old.
+  if (!pick) {
+    const old = notes
+      .map((n) => ({ n, days: daysBetweenTodayAnd(dayKeyOf(n.ts)) }))
+      .filter((o) => o.days >= 6)
+      .sort((a, b) => b.days - a.days)[0];
+    if (old) pick = { note: old.n, days: old.days };
+  }
+  if (!pick) { box.hidden = true; return; }
+  box.hidden = false;
+  box.querySelector(".otd-when").textContent = relativeWhen(pick.days);
+  const t = pick.note.text.replace(/\s+/g, " ").trim();
+  box.querySelector(".otd-text").textContent = t.length > 240 ? t.slice(0, 237) + "…" : t;
+}
+
+// ---- Letters to your future self (check-in page) ----
+const LETTERS_KEY = "mindful-letters";
+const loadLetters = () => loadFrom(LETTERS_KEY);
+const saveLetters = (ls) => localStorage.setItem(LETTERS_KEY, JSON.stringify(ls));
+
+function renderLetters() {
+  const wrap = document.getElementById("letters-list");
+  if (!wrap) return;
+  const today = todayKey();
+  const letters = loadLetters();
+  const due = letters.filter((l) => l.deliverOn <= today).sort((a, b) => b.deliverOn.localeCompare(a.deliverOn));
+  const sealed = letters.filter((l) => l.deliverOn > today).sort((a, b) => a.deliverOn.localeCompare(b.deliverOn));
+
+  wrap.innerHTML = "";
+  for (const l of due) {
+    const card = document.createElement("div");
+    card.className = "letter-card";
+    const meta = document.createElement("p");
+    meta.className = "letter-meta";
+    meta.textContent = `📬 A letter you wrote ${friendlyDate(l.created)}`;
+    const body = document.createElement("p");
+    body.className = "letter-text";
+    body.textContent = l.text;
+    card.append(meta, body);
+    wrap.appendChild(card);
+  }
+  // Quietly mark delivered letters opened (they stay visible).
+  if (due.some((l) => !l.opened)) {
+    saveLetters(letters.map((l) => (l.deliverOn <= today ? { ...l, opened: true } : l)));
+  }
+  const sealedEl = document.getElementById("letters-sealed");
+  if (sealedEl) {
+    sealedEl.hidden = sealed.length === 0;
+    if (sealed.length)
+      sealedEl.textContent = `🔒 ${sealed.length} sealed — next opens ${friendlyDate(sealed[0].deliverOn)}.`;
+  }
+}
+
+const letterToggle = document.getElementById("letter-toggle");
+const letterComposer = document.getElementById("letter-composer");
+if (letterToggle && letterComposer) {
+  const dateInput = document.getElementById("letter-date");
+  const textInput = document.getElementById("letter-text");
+  if (dateInput) {
+    dateInput.min = todayKey(-1); // tomorrow
+    dateInput.value = todayKey(-30); // a month out, by default
+  }
+  letterToggle.addEventListener("click", () => {
+    letterComposer.hidden = !letterComposer.hidden;
+    if (!letterComposer.hidden && textInput) textInput.focus();
+  });
+  const cancel = document.getElementById("letter-cancel");
+  if (cancel)
+    cancel.addEventListener("click", () => {
+      letterComposer.hidden = true;
+      if (textInput) textInput.value = "";
+    });
+  const save = document.getElementById("letter-save");
+  if (save)
+    save.addEventListener("click", () => {
+      const text = (textInput.value || "").trim();
+      const deliverOn = dateInput.value;
+      if (!text) { textInput.focus(); return; }
+      if (!deliverOn || deliverOn <= todayKey()) { dateInput.focus(); return; }
+      const letters = loadLetters();
+      letters.push({ id: Date.now(), created: new Date().toISOString(), deliverOn, text, opened: false });
+      saveLetters(letters);
+      textInput.value = "";
+      letterComposer.hidden = true;
+      renderLetters();
+      const msg = document.getElementById("letter-saved");
+      if (msg) { msg.hidden = false; setTimeout(() => (msg.hidden = true), 3500); }
+    });
+}
+
+// ---- Mood × theme correlations (insights page) ----
+// Joins the words you write with the mood you logged the same day — something
+// a plain journal can't do.
+function renderWordPatterns(entries) {
+  const list = document.getElementById("word-patterns");
+  if (!list) return;
+
+  const moodByDay = {};
+  for (const e of entries) moodByDay[e.date] = e.mood;
+  const overall = avg(entries.map((e) => e.mood));
+
+  const items = [];
+  for (const n of loadNotes()) if (n && n.text) items.push({ day: dayKeyOf(n.ts), text: n.text });
+  for (const e of entries) if (e.note) items.push({ day: e.date, text: e.note });
+
+  const byTheme = {};
+  for (const it of items) {
+    for (const th of detectThemes(it.text)) {
+      const slot = (byTheme[th.key] ||= { label: th.label, moods: [], count: 0 });
+      slot.count += 1;
+      if (moodByDay[it.day] != null) slot.moods.push(moodByDay[it.day]);
+    }
+  }
+
+  const findings = [];
+  if (overall != null) {
+    const linked = Object.values(byTheme)
+      .filter((s) => s.moods.length >= 2)
+      .map((s) => ({ ...s, m: avg(s.moods) }))
+      .sort((a, b) => Math.abs(b.m - overall) - Math.abs(a.m - overall));
+    for (const s of linked.slice(0, 2)) {
+      if (Math.abs(s.m - overall) < 0.4) continue;
+      const dir = s.m < overall ? "lower" : "brighter";
+      findings.push(
+        `On days you write about ${s.label}, your mood averages ${s.m.toFixed(1)}/5 — ${dir} than your usual ${overall.toFixed(1)}/5.`
+      );
+    }
+  }
+  const top = Object.values(byTheme).sort((a, b) => b.count - a.count)[0];
+  if (top && top.count >= 3)
+    findings.push(`${capitalize(top.label)} comes up most in your writing — ${top.count} times.`);
+
+  list.innerHTML = findings.length
+    ? findings.map((f) => `<li>${f}</li>`).join("")
+    : '<li class="insight-empty">Journal a few times and check in alongside — Lumen will start to notice how your words and your mood connect.</li>';
+}
+
+// Initial paint — now that every helper above is defined.
+render();
