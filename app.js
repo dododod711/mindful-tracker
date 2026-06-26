@@ -16,7 +16,7 @@ const MOOD_MOUTHS = {
   5: "M8 14 Q12 17 16 14",
 };
 const moodFace = (n) =>
-  `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10v.01M15 10v.01"/><path d="${MOOD_MOUTHS[n]}"/></svg>`;
+  `<svg class="ic mood-c${n}" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10v.01M15 10v.01"/><path d="${MOOD_MOUTHS[n]}"/></svg>`;
 
 // Small inline icons for the entry meta line.
 const ICON = {
@@ -345,7 +345,7 @@ function renderChart(entries) {
     else emoji.textContent = "·";
 
     const bar = document.createElement("div");
-    bar.className = "chart-bar" + (entry ? "" : " empty");
+    bar.className = "chart-bar" + (entry ? " mood-c" + entry.mood : " empty");
     bar.style.height = entry ? `${entry.mood * 20}%` : "4px";
     bar.title = entry ? `${key}: mood ${entry.mood}/5` : `${key}: no entry`;
 

@@ -12,6 +12,11 @@
   --accent: #4f7259;        /* sage */
   --accent-dark: #3d5a46;   /* deep sage */
   --accent-soft: #e7eee3;   /* pale sage */
+  --mood-1: #c0493a;        /* rough — brick red */
+  --mood-2: #cc7a42;        /* low — warm orange */
+  --mood-3: #bd9a3e;        /* okay — gold */
+  --mood-4: #789a50;        /* good — olive green */
+  --mood-5: #4f7259;        /* great — sage green */
   --clay: #b97f5f;          /* warm terracotta */
   --danger: #a85b4e;
   --border: #e6decd;
@@ -32,6 +37,11 @@
     --accent: #8caf91;
     --accent-dark: #aac9af;
     --accent-soft: #32403434;
+    --mood-1: #d97363;
+    --mood-2: #d99a5e;
+    --mood-3: #cdb15c;
+    --mood-4: #9cc070;
+    --mood-5: #8caf91;
     --clay: #c89274;
     --danger: #cd8a7c;
     --border: #3a3e33;
@@ -487,6 +497,20 @@ legend {
 .mood-option:has(input:checked) .mood-emoji {
   transform: scale(1.12);
 }
+
+/* Color-coded mood scale: rough = red … great = green */
+.mood-option:has(input[value="1"]) .mood-emoji { color: var(--mood-1); }
+.mood-option:has(input[value="2"]) .mood-emoji { color: var(--mood-2); }
+.mood-option:has(input[value="3"]) .mood-emoji { color: var(--mood-3); }
+.mood-option:has(input[value="4"]) .mood-emoji { color: var(--mood-4); }
+.mood-option:has(input[value="5"]) .mood-emoji { color: var(--mood-5); }
+
+/* The selected option is tinted with its own mood color */
+.mood-option:has(input[value="1"]:checked) { border-color: var(--mood-1); background: color-mix(in srgb, var(--mood-1) 14%, var(--card)); }
+.mood-option:has(input[value="2"]:checked) { border-color: var(--mood-2); background: color-mix(in srgb, var(--mood-2) 14%, var(--card)); }
+.mood-option:has(input[value="3"]:checked) { border-color: var(--mood-3); background: color-mix(in srgb, var(--mood-3) 14%, var(--card)); }
+.mood-option:has(input[value="4"]:checked) { border-color: var(--mood-4); background: color-mix(in srgb, var(--mood-4) 14%, var(--card)); }
+.mood-option:has(input[value="5"]:checked) { border-color: var(--mood-5); background: color-mix(in srgb, var(--mood-5) 14%, var(--card)); }
 
 /* The real inputs are invisible, so keyboard focus must show on the labels */
 .mood-option:has(input:focus-visible),
@@ -1689,20 +1713,28 @@ textarea:focus {
   height: 2rem;
 }
 
-.mood-option:has(input:checked) .mood-emoji {
-  color: var(--accent);
-}
+/* Mood face colors in the chart and journal entries (moodFace adds .mood-cN) */
+.mood-c1 { color: var(--mood-1); }
+.mood-c2 { color: var(--mood-2); }
+.mood-c3 { color: var(--mood-3); }
+.mood-c4 { color: var(--mood-4); }
+.mood-c5 { color: var(--mood-5); }
+
+/* Chart bars take the same mood scale */
+.chart-bar.mood-c1 { background: linear-gradient(180deg, var(--mood-1), color-mix(in srgb, var(--mood-1), #000 22%)); }
+.chart-bar.mood-c2 { background: linear-gradient(180deg, var(--mood-2), color-mix(in srgb, var(--mood-2), #000 22%)); }
+.chart-bar.mood-c3 { background: linear-gradient(180deg, var(--mood-3), color-mix(in srgb, var(--mood-3), #000 22%)); }
+.chart-bar.mood-c4 { background: linear-gradient(180deg, var(--mood-4), color-mix(in srgb, var(--mood-4), #000 22%)); }
+.chart-bar.mood-c5 { background: linear-gradient(180deg, var(--mood-5), color-mix(in srgb, var(--mood-5), #000 22%)); }
 
 .entry-mood .ic {
   width: 1.4rem;
   height: 1.4rem;
-  color: var(--accent-dark);
 }
 
 .chart-emoji .ic {
   width: 1.15rem;
   height: 1.15rem;
-  color: var(--accent-dark);
 }
 
 .entry-meta .ic {
