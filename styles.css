@@ -113,10 +113,13 @@ body.has-dotgrid,
   background: transparent;
 }
 
+/* Frosted glass tinted toward the green/teal scheme: more see-through, and the
+   blur+saturate lets each card pick up the aurora colour behind it. */
 .has-dotgrid .card {
-  background: color-mix(in srgb, var(--card) 88%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: color-mix(in srgb, color-mix(in srgb, var(--accent) 12%, var(--card)) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
 .home-cta {
