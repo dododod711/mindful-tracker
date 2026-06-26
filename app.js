@@ -1039,5 +1039,59 @@ function renderWordPatterns(entries) {
     : '<li class="insight-empty">Journal a few times and check in alongside — Lumen will start to notice how your words and your mood connect.</li>';
 }
 
+// ---- Voice input (speech-to-text) for the journal and the assistant ----
+// Uses the browser's built-in SpeechRecognition. The mic hides itself where
+// that isn't available. (Audio is handled by the device/browser's speech
+// service; only the resulting text is kept, here on your device.)
+function attachDictation(btn, field) {
+  if (!btn || !field) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    btn.hidden = true;
+    return;
+  }
+  let rec = null;
+  let listening = false;
+  let base = "";
+  btn.addEventListener("click", () => {
+    if (listening) {
+      if (rec) rec.stop();
+      return;
+    }
+    rec = new SR();
+    rec.lang = navigator.language || "en-US";
+    rec.interimResults = true;
+    rec.continuous = true;
+    base = field.value.trim() ? field.value.replace(/\s+$/, "") + " " : "";
+    rec.onstart = () => {
+      listening = true;
+      btn.classList.add("listening");
+      btn.setAttribute("aria-pressed", "true");
+    };
+    rec.onend = () => {
+      listening = false;
+      btn.classList.remove("listening");
+      btn.setAttribute("aria-pressed", "false");
+      rec = null;
+      field.focus();
+    };
+    rec.onerror = () => {
+      if (rec) {
+        try { rec.stop(); } catch (e) {}
+      }
+    };
+    rec.onresult = (e) => {
+      let txt = "";
+      for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
+      field.value = base + txt;
+      field.dispatchEvent(new Event("input"));
+    };
+    try { rec.start(); } catch (e) {}
+  });
+}
+
+attachDictation(document.getElementById("journal-mic"), document.getElementById("journal-text"));
+attachDictation(document.getElementById("chat-mic"), document.getElementById("chat-input"));
+
 // Initial paint — now that every helper above is defined.
 render();

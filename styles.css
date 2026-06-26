@@ -1603,3 +1603,65 @@ textarea:focus {
   background: var(--field);
   color: var(--ink);
 }
+
+/* Voice input (speech-to-text) */
+.mic-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  background: var(--field);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.mic-btn[hidden] {
+  display: none;
+}
+
+.mic-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+/* In the assistant chat row, match the input height */
+.chat-form .mic-btn {
+  width: 2.9rem;
+  align-self: stretch;
+  font-size: 1.15rem;
+}
+
+/* In the journal composer, a small button beside the "Write freely" label */
+.composer-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.composer-label-row label {
+  margin: 0;
+}
+
+.composer-label-row .mic-btn {
+  width: 2.3rem;
+  height: 2.3rem;
+  font-size: 1.05rem;
+}
+
+.mic-btn.listening {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+  animation: mic-pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 55%, transparent); }
+  50% { box-shadow: 0 0 0 7px transparent; }
+}

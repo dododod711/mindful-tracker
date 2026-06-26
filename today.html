@@ -133,8 +133,11 @@
               <p class="composer-prompt" id="journal-prompt" title="Tap to start with this prompt"></p>
               <button type="button" id="prompt-shuffle" class="prompt-shuffle" aria-label="Suggest another prompt">↻</button>
             </div>
-            <label for="journal-text">Write freely</label>
-            <textarea id="journal-text" rows="5" placeholder="What's on your mind right now?"></textarea>
+            <div class="composer-label-row">
+              <label for="journal-text">Write freely</label>
+              <button type="button" id="journal-mic" class="mic-btn" aria-label="Dictate your entry" title="Dictate — uses your device's speech recognition">🎤</button>
+            </div>
+            <textarea id="journal-text" rows="5" placeholder="What's on your mind right now? (or tap 🎤 to speak)"></textarea>
             <div class="composer-actions">
               <button id="composer-save" class="btn-primary">Save entry</button>
               <button id="composer-cancel" class="btn-ghost">Cancel</button>
