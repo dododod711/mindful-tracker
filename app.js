@@ -7,7 +7,23 @@
 
 const STORAGE_KEY = "mindful-entries";
 const JOURNAL_KEY = "mindful-journal";
-const MOOD_EMOJI = { 1: "😞", 2: "😕", 3: "😐", 4: "🙂", 5: "😄" };
+// Custom line-icon mood faces (sad → happy), drawn with the shared .ic class.
+const MOOD_MOUTHS = {
+  1: "M8 16 Q12 13 16 16",
+  2: "M8.5 15.5 Q12 14 15.5 15.5",
+  3: "M8.5 15 H15.5",
+  4: "M8.5 14.5 Q12 16 15.5 14.5",
+  5: "M8 14 Q12 17 16 14",
+};
+const moodFace = (n) =>
+  `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10v.01M15 10v.01"/><path d="${MOOD_MOUTHS[n]}"/></svg>`;
+
+// Small inline icons for the entry meta line.
+const ICON = {
+  sleep: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.3 6.3 0 0 0 20 14.5z"/></svg>',
+  energy: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+  stress: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>',
+};
 
 // ---- Storage helpers ----
 function loadFrom(key) {
@@ -321,7 +337,8 @@ function renderChart(entries) {
 
     const emoji = document.createElement("span");
     emoji.className = "chart-emoji";
-    emoji.textContent = entry ? MOOD_EMOJI[entry.mood] : "·";
+    if (entry) emoji.innerHTML = moodFace(entry.mood);
+    else emoji.textContent = "·";
 
     const bar = document.createElement("div");
     bar.className = "chart-bar" + (entry ? "" : " empty");
@@ -415,9 +432,9 @@ function renderJournal(entries) {
 
       el.innerHTML = `
         <div class="entry-head">
-          <span class="entry-mood">${MOOD_EMOJI[entry.mood]}</span>
+          <span class="entry-mood">${moodFace(entry.mood)}</span>
           <span class="entry-date">${date}</span>
-          <span class="entry-meta">😴 ${entry.sleep}h · ⚡ ${entry.energy}/10 · 😣 ${entry.stress}/10 · <button class="entry-delete" data-date="${entry.date}">delete</button></span>
+          <span class="entry-meta">${ICON.sleep} ${entry.sleep}h · ${ICON.energy} ${entry.energy}/10 · ${ICON.stress} ${entry.stress}/10 · <button class="entry-delete" data-date="${entry.date}">delete</button></span>
         </div>
         ${tagsHtml ? `<div class="entry-tags">${tagsHtml}</div>` : ""}
         ${entry.note ? `<p class="entry-note"></p>` : ""}

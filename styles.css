@@ -1665,3 +1665,70 @@ textarea:focus {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 55%, transparent); }
   50% { box-shadow: 0 0 0 7px transparent; }
 }
+
+/* ===== Line icons (replace the emoji set) ===== */
+.ic {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -0.15em;
+}
+
+/* Mood faces */
+.mood-emoji {
+  color: var(--ink-soft);
+}
+
+.mood-emoji .ic {
+  width: 2rem;
+  height: 2rem;
+}
+
+.mood-option:has(input:checked) .mood-emoji {
+  color: var(--accent);
+}
+
+.entry-mood .ic {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--accent-dark);
+}
+
+.chart-emoji .ic {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--accent-dark);
+}
+
+.entry-meta .ic {
+  width: 0.95em;
+  height: 0.95em;
+  margin-right: 0.05em;
+  vertical-align: -0.12em;
+}
+
+/* Home destination icons */
+.home-card .home-icon {
+  color: var(--accent);
+}
+
+/* Resource heading icons */
+.resource-card h3 .ic {
+  width: 1.3em;
+  height: 1.3em;
+  color: var(--accent);
+  margin-right: 0.4em;
+  vertical-align: -0.2em;
+}
+
+/* Tag icons */
+.tag span .ic {
+  margin-right: 0.4em;
+  vertical-align: -0.18em;
+  color: var(--accent-dark);
+}
