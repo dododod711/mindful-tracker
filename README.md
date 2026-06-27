@@ -120,6 +120,10 @@ open desktop/dist/Lumen.app
 | `FRIENDS_SETUP.md` | Friends backend setup guide |
 | `desktop/` | macOS WebKit wrapper (`build.sh`, `main.swift`, `makeicon.swift`) |
 
+## License
+
+Released under the [MIT License](LICENSE).
+
 ## Disclaimer
 
 Lumen is for **educational and self-reflection purposes only** — its trends, stats, and
