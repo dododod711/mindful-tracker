@@ -128,10 +128,17 @@
   const starter = document.getElementById("tour-start");
   if (starter) starter.addEventListener("click", open);
 
-  // Auto-open once, on a first visit, after a short beat.
+  // Auto-open once on a visitor's first arrival — whichever page they land on —
+  // after a short beat. Mark it seen the moment it opens so it never pops again
+  // as they move around the site.
   let seen = false;
   try {
     seen = localStorage.getItem(SEEN_KEY) === "1";
   } catch (e) {}
-  if (!seen) setTimeout(open, 900);
+  if (!seen) {
+    setTimeout(() => {
+      try { localStorage.setItem(SEEN_KEY, "1"); } catch (e) {}
+      open();
+    }, 900);
+  }
 })();

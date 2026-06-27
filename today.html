@@ -116,7 +116,11 @@
               <textarea id="note" name="note" rows="3" placeholder="One small win, one worry, anything…"></textarea>
             </div>
 
-            <button type="submit" class="btn-primary">Save today's check-in</button>
+            <div class="checkin-actions">
+              <button type="submit" class="btn-primary">Save today's check-in</button>
+              <button type="button" id="cancel-edit" class="btn-ghost" hidden>Cancel edit</button>
+            </div>
+            <p id="edit-banner" class="edit-banner" role="status" hidden></p>
             <p id="save-msg" class="save-msg" role="status" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Saved. Nice work checking in.</p>
           </form>
         </div>
@@ -217,6 +221,7 @@
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="friends.js"></script>
+  <script src="tour.js"></script>
   <script>
     if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
       navigator.serviceWorker.register("sw.js").catch(() => {});

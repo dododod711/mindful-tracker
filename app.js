@@ -68,14 +68,16 @@ for (const id of ["sleep", "energy", "stress"]) {
 // ---- Check-in form (check-in page) ----
 const form = document.getElementById("checkin-form");
 const saveMsg = document.getElementById("save-msg");
+let editingDate = null; // when set, the form edits that day's check-in instead of today's
 
 if (form) {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(form);
+    const targetDate = editingDate || todayKey();
 
     const entry = {
-      date: todayKey(),
+      date: targetDate,
       mood: Number(data.get("mood")),
       sleep: Number(data.get("sleep")),
       energy: Number(data.get("energy")),
@@ -84,11 +86,13 @@ if (form) {
       note: data.get("note").trim(),
     };
 
-    // One entry per day — replace today's if it exists.
-    const entries = loadEntries().filter((en) => en.date !== entry.date);
+    // One entry per day — replace that day's if it exists.
+    const entries = loadEntries().filter((en) => en.date !== targetDate);
     entries.push(entry);
     entries.sort((a, b) => b.date.localeCompare(a.date));
     saveEntries(entries);
+
+    if (editingDate) exitEditMode();
 
     if (saveMsg) {
       saveMsg.hidden = false;
@@ -98,6 +102,9 @@ if (form) {
     // If Friends is on and signed in, push the new mood/streak (no-op otherwise).
     if (window.LumenSync) window.LumenSync.pushState();
   });
+
+  const cancelEditBtn = document.getElementById("cancel-edit");
+  if (cancelEditBtn) cancelEditBtn.addEventListener("click", () => exitEditMode());
 }
 
 // ---- Journal composer (check-in page) ----
@@ -296,10 +303,31 @@ function renderInsights(entries) {
 
 function updateCheckinButton(entries) {
   if (!form) return;
+  const btn = form.querySelector('button[type="submit"]');
+  if (editingDate) {
+    btn.textContent = `Update ${friendlyDate(editingDate)} check-in`;
+    return;
+  }
   const hasToday = entries.some((en) => en.date === todayKey());
-  form.querySelector('button[type="submit"]').textContent = hasToday
-    ? "Update today's check-in"
-    : "Save today's check-in";
+  btn.textContent = hasToday ? "Update today's check-in" : "Save today's check-in";
+}
+
+// Fill the check-in form from an entry — today's, or a past one being edited.
+function fillFormFrom(entry) {
+  if (!form || !entry) return;
+  const moodInput = form.querySelector(`input[name="mood"][value="${entry.mood}"]`);
+  if (moodInput) moodInput.checked = true;
+
+  for (const id of ["sleep", "energy", "stress"]) {
+    document.getElementById(id).value = entry[id];
+    document.getElementById(`${id}-out`).value = entry[id];
+  }
+
+  for (const box of form.querySelectorAll('input[name="tags"]')) {
+    box.checked = (entry.tags || []).includes(box.value);
+  }
+
+  document.getElementById("note").value = entry.note || "";
 }
 
 // Pre-fill the form with today's check-in so updating doesn't start from
@@ -308,21 +336,47 @@ function updateCheckinButton(entries) {
 function prefillCheckinForm() {
   if (!form) return;
   const today = loadEntries().find((en) => en.date === todayKey());
-  if (!today) return;
+  if (today) fillFormFrom(today);
+}
 
-  const moodInput = form.querySelector(`input[name="mood"][value="${today.mood}"]`);
-  if (moodInput) moodInput.checked = true;
-
+// Reset the form back to "today" mode: HTML defaults, then today's entry if any.
+function resetFormToToday() {
+  if (!form) return;
+  form.reset();
   for (const id of ["sleep", "energy", "stress"]) {
-    document.getElementById(id).value = today[id];
-    document.getElementById(`${id}-out`).value = today[id];
+    document.getElementById(`${id}-out`).value = document.getElementById(id).value;
   }
+  const today = loadEntries().find((en) => en.date === todayKey());
+  if (today) fillFormFrom(today);
+}
 
-  for (const box of form.querySelectorAll('input[name="tags"]')) {
-    box.checked = today.tags.includes(box.value);
+// Edit a past check-in: load it into the form and mark the form as editing it.
+function startEdit(entry) {
+  if (!form || !entry) return;
+  editingDate = entry.date;
+  fillFormFrom(entry);
+  const banner = document.getElementById("edit-banner");
+  if (banner) {
+    banner.textContent = `Editing your check-in for ${friendlyDate(entry.date)}.`;
+    banner.hidden = false;
   }
+  const cancel = document.getElementById("cancel-edit");
+  if (cancel) cancel.hidden = false;
+  updateCheckinButton(loadEntries());
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+  const checked = form.querySelector('input[name="mood"]:checked');
+  if (checked) checked.focus();
+}
 
-  document.getElementById("note").value = today.note;
+// Leave edit mode and return the form to today.
+function exitEditMode() {
+  editingDate = null;
+  const banner = document.getElementById("edit-banner");
+  if (banner) banner.hidden = true;
+  const cancel = document.getElementById("cancel-edit");
+  if (cancel) cancel.hidden = true;
+  resetFormToToday();
+  updateCheckinButton(loadEntries());
 }
 
 function renderChart(entries) {
@@ -440,7 +494,7 @@ function renderJournal(entries) {
         <div class="entry-head">
           <span class="entry-mood">${moodFace(entry.mood)}</span>
           <span class="entry-date">${date}</span>
-          <span class="entry-meta">${ICON.sleep} ${entry.sleep}h · ${ICON.energy} ${entry.energy}/10 · ${ICON.stress} ${entry.stress}/10 · <button class="entry-delete" data-date="${entry.date}">delete</button></span>
+          <span class="entry-meta">${ICON.sleep} ${entry.sleep}h · ${ICON.energy} ${entry.energy}/10 · ${ICON.stress} ${entry.stress}/10 · <button class="entry-edit" data-date="${entry.date}">edit</button> · <button class="entry-delete" data-date="${entry.date}">delete</button></span>
         </div>
         ${tagsHtml ? `<div class="entry-tags">${tagsHtml}</div>` : ""}
         ${entry.note ? `<p class="entry-note"></p>` : ""}
@@ -480,6 +534,13 @@ function renderJournal(entries) {
 const entriesList = document.getElementById("entries");
 if (entriesList) {
   entriesList.addEventListener("click", (e) => {
+    const editBtn = e.target.closest(".entry-edit");
+    if (editBtn) {
+      const entry = loadEntries().find((en) => en.date === editBtn.dataset.date);
+      if (entry) startEdit(entry);
+      return;
+    }
+
     const btn = e.target.closest(".entry-delete");
     if (!btn) return;
 
