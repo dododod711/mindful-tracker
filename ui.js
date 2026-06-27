@@ -13,3 +13,36 @@ for (const input of document.querySelectorAll('input[type="range"]')) {
   updateFill(input); // reflect prefilled values from today's check-in
   input.addEventListener("input", () => updateFill(input));
 }
+
+// A slim reading-progress bar along the very top, and a touch of depth on the
+// sticky header once you've scrolled. Both are decorative and unobtrusive.
+(function () {
+  const bar = document.createElement("div");
+  bar.className = "scroll-progress";
+  bar.setAttribute("aria-hidden", "true");
+  const fill = document.createElement("div");
+  fill.className = "scroll-progress-bar";
+  bar.appendChild(fill);
+  document.body.appendChild(bar);
+
+  let ticking = false;
+  function update() {
+    ticking = false;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 4 ? Math.min((window.scrollY / max) * 100, 100) : 0;
+    fill.style.width = pct + "%";
+    document.body.classList.toggle("is-scrolled", window.scrollY > 8);
+  }
+  addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    },
+    { passive: true }
+  );
+  addEventListener("resize", update);
+  update();
+})();

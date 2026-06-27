@@ -2380,3 +2380,29 @@ textarea:focus {
   .tour-stack-overlay { animation: none; }
   .scroll-stack-card { transition: none; }
 }
+
+/* ===== Reading-progress bar + scroll-aware header depth ===== */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 20;
+  pointer-events: none;
+  background: transparent;
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+  border-radius: 0 3px 3px 0;
+  transition: width 0.12s linear;
+}
+.site-header {
+  transition: box-shadow 0.25s ease;
+}
+body.is-scrolled .site-header {
+  box-shadow: var(--shadow-md);
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress-bar { transition: none; }
+}
