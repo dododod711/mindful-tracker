@@ -767,13 +767,16 @@ if (goodForm) {
   const goodList = document.getElementById("good-list");
   const goodInputs = [...goodForm.querySelectorAll("input")];
 
-  // Show the last few days back to the user — user text via textContent only.
+  const goodToggle = document.getElementById("good-toggle");
+  let listShown = false; // saved entries stay hidden until the user asks for them
+
+  // Build the saved list — user text via textContent only. Visibility is
+  // controlled by the toggle below, not here.
   function renderGoodList() {
     if (!goodList) return;
     const days = loadFrom(GOOD_KEY)
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 5);
-    goodList.hidden = days.length === 0;
     goodList.innerHTML = "";
     for (const g of days) {
       const dayLi = document.createElement("li");
@@ -799,13 +802,42 @@ if (goodForm) {
     }
   }
 
-  // Prefill today's, if it's already been written.
-  const todaysGood = loadFrom(GOOD_KEY).find((g) => g.date === todayKey());
-  if (todaysGood)
-    todaysGood.items.forEach((t, n) => {
-      if (goodInputs[n]) goodInputs[n].value = t;
+  // Show or hide the "Show saved" button (only useful once something's saved).
+  function updateGoodToggle() {
+    const has = loadFrom(GOOD_KEY).length > 0;
+    if (goodToggle) {
+      goodToggle.hidden = !has;
+      goodToggle.textContent = listShown ? "Hide saved" : "Show saved";
+    }
+    if (!has) {
+      listShown = false;
+      if (goodList) goodList.hidden = true;
+    }
+  }
+
+  // Drop today's saved entry into the form for editing — only when the user
+  // reveals their saved good things, and only if they haven't started typing.
+  function prefillTodaysGood() {
+    if (!goodInputs.every((el) => !el.value.trim())) return;
+    const t = loadFrom(GOOD_KEY).find((g) => g.date === todayKey());
+    if (t) t.items.forEach((txt, n) => { if (goodInputs[n]) goodInputs[n].value = txt; });
+  }
+
+  if (goodToggle)
+    goodToggle.addEventListener("click", () => {
+      listShown = !listShown;
+      if (listShown) {
+        prefillTodaysGood();
+        renderGoodList();
+        if (goodList) goodList.hidden = false;
+      } else if (goodList) {
+        goodList.hidden = true;
+      }
+      updateGoodToggle();
     });
-  renderGoodList();
+
+  if (goodList) goodList.hidden = true; // saved entries hidden until requested
+  updateGoodToggle();
 
   goodForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -819,7 +851,8 @@ if (goodForm) {
     localStorage.setItem(GOOD_KEY, JSON.stringify(all));
     goodSaved.hidden = false;
     setTimeout(() => (goodSaved.hidden = true), 2500);
-    renderGoodList();
+    if (listShown) renderGoodList(); // refresh only if it's currently open
+    updateGoodToggle();
   });
 }
 
