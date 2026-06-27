@@ -1,6 +1,6 @@
-// tour.js — optional, opt-in website walkthrough. A dependency-free port of the
-// Reactbits <Stepper>: clickable step indicators, Back/Next navigation, and a
-// final "Done". Opens from the "Take a tour" button, and once on a first visit.
+// tour.js — the opt-in walkthrough, presented as a ScrollStack (see
+// scrollstack.js): the steps are full cards that pin and scale as you scroll
+// through them. Opens from the "Take a tour" button and once on a first visit.
 (function () {
   const ICON = {
     spark: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.5 4 1.5 5 6 6-4.5 1-5.5 2-6 6-.5-4-1.5-5-6-6 4.5-1 5.5-2 6-6z"/></svg>',
@@ -13,7 +13,7 @@
     {
       icon: ICON.spark,
       title: "Welcome to Lumen",
-      text: "A calm, private space to check in with how you're doing. Here's a quick tour — you can skip it anytime.",
+      text: "A calm, private space to check in with how you're doing. Scroll through this quick tour — you can close it anytime.",
     },
     {
       icon: ICON.pencil,
@@ -28,7 +28,7 @@
     {
       icon: ICON.planet,
       title: "Stargaze",
-      text: "Your notes become a slowly breathing planet of stars you can steer with your hand or cursor — a moment to slow down and reset.",
+      text: "Your notes become a slowly breathing planet of stars you can steer with your hand or cursor — each one glows in that day's mood.",
     },
     {
       icon: ICON.lock,
@@ -38,81 +38,69 @@
   ];
   const SEEN_KEY = "mindful-tour-seen";
 
-  let overlay, dotsWrap, iconEl, titleEl, textEl, backBtn, nextBtn, lastFocus;
-  let current = 0;
+  let overlay, scroller, closeBtn, lastFocus, stack;
 
   function build() {
     overlay = document.createElement("div");
-    overlay.className = "tour-overlay";
+    overlay.className = "tour-stack-overlay";
     overlay.hidden = true;
+
+    const cards = steps
+      .map(
+        (s) =>
+          '<div class="scroll-stack-card">' +
+          '<div class="tour-card-icon">' + s.icon + "</div>" +
+          "<h2>" + s.title + "</h2>" +
+          "<p>" + s.text + "</p>" +
+          "</div>"
+      )
+      .join("");
+
     overlay.innerHTML =
-      '<div class="tour-card" role="dialog" aria-modal="true" aria-label="Website tour">' +
-      '<button class="tour-close" type="button" aria-label="Close tour">×</button>' +
-      '<div class="tour-dots"></div>' +
-      '<div class="tour-body"><div class="tour-icon"></div><h2 class="tour-title"></h2><p class="tour-text"></p></div>' +
-      '<div class="tour-nav"><button class="tour-back btn-ghost" type="button">Previous</button>' +
-      '<button class="tour-next btn-primary" type="button">Next</button></div>' +
-      "</div>";
+      '<button class="tour-stack-close" type="button" aria-label="Close tour">×</button>' +
+      '<div class="scroll-stack-scroller" role="dialog" aria-modal="true" aria-label="Website tour">' +
+      '<div class="scroll-stack-inner">' +
+      cards +
+      '<div class="scroll-stack-card tour-card-final">' +
+      "<h2>You’re all set</h2>" +
+      "<p>That’s the tour. Everything stays on your device — start wherever feels right.</p>" +
+      '<button class="btn-primary tour-stack-done" type="button">Start exploring</button>' +
+      "</div>" +
+      '<div class="scroll-stack-end"></div>' +
+      "</div></div>";
+
     document.body.appendChild(overlay);
+    scroller = overlay.querySelector(".scroll-stack-scroller");
+    closeBtn = overlay.querySelector(".tour-stack-close");
 
-    dotsWrap = overlay.querySelector(".tour-dots");
-    iconEl = overlay.querySelector(".tour-icon");
-    titleEl = overlay.querySelector(".tour-title");
-    textEl = overlay.querySelector(".tour-text");
-    backBtn = overlay.querySelector(".tour-back");
-    nextBtn = overlay.querySelector(".tour-next");
-
-    steps.forEach((_, i) => {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "tour-dot";
-      dot.setAttribute("aria-label", "Go to step " + (i + 1));
-      dot.addEventListener("click", () => go(i));
-      dotsWrap.appendChild(dot);
-    });
-
-    overlay.querySelector(".tour-close").addEventListener("click", () => close());
-    backBtn.addEventListener("click", () => go(current - 1));
-    nextBtn.addEventListener("click", () => {
-      if (current === steps.length - 1) close();
-      else go(current + 1);
-    });
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) close();
-    });
+    closeBtn.addEventListener("click", close);
+    overlay.querySelector(".tour-stack-done").addEventListener("click", close);
     document.addEventListener("keydown", (e) => {
-      if (overlay.hidden) return;
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight" && current < steps.length - 1) go(current + 1);
-      else if (e.key === "ArrowLeft" && current > 0) go(current - 1);
+      if (!overlay.hidden && e.key === "Escape") close();
     });
-  }
-
-  function render() {
-    const s = steps[current];
-    iconEl.innerHTML = s.icon;
-    titleEl.textContent = s.title;
-    textEl.textContent = s.text;
-    backBtn.disabled = current === 0;
-    nextBtn.textContent = current === steps.length - 1 ? "Done" : "Next";
-    [...dotsWrap.children].forEach((d, i) => {
-      d.classList.toggle("active", i === current);
-      d.classList.toggle("done", i < current);
-    });
-  }
-
-  function go(i) {
-    current = Math.max(0, Math.min(steps.length - 1, i));
-    render();
   }
 
   function open() {
     lastFocus = document.activeElement;
-    current = 0;
-    render();
     overlay.hidden = false;
     document.body.style.overflow = "hidden";
-    nextBtn.focus();
+    scroller.scrollTop = 0;
+    // Init once the overlay is laid out so card offsets are measurable.
+    if (window.ScrollStack) {
+      if (!stack) {
+        stack = window.ScrollStack.init(scroller, {
+          baseScale: 0.86,
+          itemScale: 0.035,
+          itemDistance: 80,
+          itemStackDistance: 26,
+          stackPosition: "16%",
+          scaleEndPosition: "6%",
+        });
+      } else {
+        stack.update();
+      }
+    }
+    closeBtn.focus();
   }
 
   function close() {
@@ -128,9 +116,8 @@
   const starter = document.getElementById("tour-start");
   if (starter) starter.addEventListener("click", open);
 
-  // Auto-open once on a visitor's first arrival — whichever page they land on —
-  // after a short beat. Mark it seen the moment it opens so it never pops again
-  // as they move around the site.
+  // Auto-open once on a visitor's first arrival; mark seen the moment it opens
+  // so it never pops again as they move around the site.
   let seen = false;
   try {
     seen = localStorage.getItem(SEEN_KEY) === "1";

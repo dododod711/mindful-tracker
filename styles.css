@@ -2284,3 +2284,99 @@ textarea:focus {
     0 0 25px 2px var(--glow-color-20),
     0 0 50px 2px var(--glow-color-10);
 }
+
+/* ===== ScrollStack tour (Reactbits port) ===== */
+.tour-stack-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(8px) saturate(1.1);
+  animation: tour-stack-in 0.35s ease;
+}
+.tour-stack-overlay[hidden] {
+  display: none;
+}
+@keyframes tour-stack-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.tour-stack-close {
+  position: fixed;
+  top: 1rem;
+  right: 1.2rem;
+  z-index: 2;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.tour-stack-close:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+.scroll-stack-scroller {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-stack-scroller::-webkit-scrollbar {
+  display: none;
+}
+.scroll-stack-inner {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 18vh 1.25rem 30vh;
+}
+.scroll-stack-card {
+  min-height: 54vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 2.75rem 2.25rem;
+  text-align: center;
+  border-radius: 26px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+.tour-card-icon {
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+.tour-card-icon .ic {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+.scroll-stack-card h2 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+.scroll-stack-card p {
+  color: var(--ink-soft);
+  line-height: 1.65;
+  max-width: 34ch;
+  margin: 0;
+}
+.tour-stack-done {
+  margin-top: 0.6rem;
+  border: none;
+  cursor: pointer;
+}
+.scroll-stack-end {
+  height: 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-stack-overlay { animation: none; }
+  .scroll-stack-card { transition: none; }
+}
