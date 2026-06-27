@@ -101,6 +101,7 @@ if (form) {
     render();
     // If Friends is on and signed in, push the new mood/streak (no-op otherwise).
     if (window.LumenSync) window.LumenSync.pushState();
+    maybeCelebrate(loadEntries());
   });
 
   const cancelEditBtn = document.getElementById("cancel-edit");
@@ -365,6 +366,57 @@ function renderWeeklyRecap(entries) {
     chip.className = "recap-trend " + (steady ? "steady" : diff > 0 ? "up" : "down");
     chip.textContent = steady ? "Steady" : (diff > 0 ? "↑ " : "↓ ") + Math.abs(diff).toFixed(1) + " vs last week";
     box.appendChild(chip);
+  }
+}
+
+// ---- Gentle streak milestones (check-in page) ----
+// A warm, dismissible note when a streak reaches a meaningful length. Each one
+// shows just once. No points, levels, or badges — just a quiet acknowledgement.
+const MILESTONE_KEY = "mindful-milestones";
+const STREAK_MILESTONES = {
+  3: "Three days in a row — a gentle rhythm is starting.",
+  7: "A full week of checking in. That's a real habit forming — quietly proud of you.",
+  14: "Two weeks running. You keep showing up for yourself.",
+  30: "Thirty days. A whole month of tending to your mind.",
+  60: "Sixty days in a row — steady, and kind to yourself.",
+  100: "One hundred days. A quiet, remarkable commitment.",
+  365: "A full year of checking in. However today felt, that's worth honouring.",
+};
+
+function celebratedMilestones() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(MILESTONE_KEY)) || []);
+  } catch {
+    return new Set();
+  }
+}
+
+function showMilestone(message) {
+  let toast = document.getElementById("milestone-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "milestone-toast";
+    toast.className = "milestone-toast";
+    toast.setAttribute("role", "status");
+    toast.innerHTML = `<span class="milestone-icon">${ICON.streak}</span><span class="milestone-text"></span>`;
+    document.body.appendChild(toast);
+    toast.addEventListener("click", () => toast.classList.remove("show"));
+  }
+  toast.querySelector(".milestone-text").textContent = message;
+  requestAnimationFrame(() => toast.classList.add("show"));
+  clearTimeout(showMilestone._t);
+  showMilestone._t = setTimeout(() => toast.classList.remove("show"), 6500);
+}
+
+function maybeCelebrate(entries) {
+  const streak = currentStreak(entries);
+  const done = celebratedMilestones();
+  if (STREAK_MILESTONES[streak] && !done.has(streak)) {
+    done.add(streak);
+    try {
+      localStorage.setItem(MILESTONE_KEY, JSON.stringify([...done]));
+    } catch {}
+    showMilestone(STREAK_MILESTONES[streak]);
   }
 }
 

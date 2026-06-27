@@ -2560,6 +2560,49 @@ body.is-scrolled .site-header {
   color: var(--accent-dark);
 }
 
+/* ===== Gentle streak milestone toast ===== */
+.milestone-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translate(-50%, 1.2rem);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  max-width: min(92vw, 30rem);
+  padding: 0.9rem 1.2rem;
+  border-radius: 14px;
+  background: var(--accent-dark);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.milestone-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.milestone-icon {
+  flex: none;
+  display: inline-flex;
+}
+.milestone-icon .ic {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .milestone-toast {
+    transition: opacity 0.2s ease;
+    transform: translate(-50%, 0);
+  }
+}
+
 /* Preloader hidden by default → only ever shows on a fresh session, never on
    later Home navigations (and never flashes on a "seen" load). */
 .preloader[hidden] {
