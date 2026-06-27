@@ -134,10 +134,14 @@
           </div>
           <button id="new-entry-btn" class="btn-primary btn-new-entry reveal reveal-left"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>New entry</button>
           <div id="composer" class="card composer" hidden>
-            <div class="composer-prompt-row">
+            <div class="composer-prompt-row" id="prompt-row">
               <p class="composer-prompt" id="journal-prompt" title="Tap to start with this prompt"></p>
-              <button type="button" id="prompt-shuffle" class="prompt-shuffle" aria-label="Suggest another prompt">↻</button>
+              <span class="prompt-controls">
+                <button type="button" id="prompt-shuffle" class="prompt-shuffle" aria-label="Suggest another prompt">↻</button>
+                <button type="button" id="prompt-dismiss" class="prompt-dismiss">Free write</button>
+              </span>
             </div>
+            <button type="button" id="prompt-show" class="prompt-show" hidden>Need a nudge? Show a prompt</button>
             <div class="composer-label-row">
               <label for="journal-text">Write freely</label>
               <button type="button" id="journal-mic" class="mic-btn" aria-label="Dictate your entry" title="Dictate — uses your device's speech recognition"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v3"/></svg></button>

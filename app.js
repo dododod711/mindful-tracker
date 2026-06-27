@@ -928,13 +928,46 @@ const pickJournalPrompt = () => {
 
 const journalPromptEl = document.getElementById("journal-prompt");
 if (journalPromptEl && newEntryBtn && composer) {
+  const FREEWRITE_KEY = "mindful-freewrite";
+  const promptRow = document.getElementById("prompt-row");
+  const promptShow = document.getElementById("prompt-show");
+  const isFreeWrite = () => {
+    try { return localStorage.getItem(FREEWRITE_KEY) === "1"; } catch (e) { return false; }
+  };
+  const setFreeWrite = (on) => {
+    try { on ? localStorage.setItem(FREEWRITE_KEY, "1") : localStorage.removeItem(FREEWRITE_KEY); } catch (e) {}
+  };
   const setPrompt = () => (journalPromptEl.textContent = pickJournalPrompt());
-  setPrompt();
+
+  // Show either the prompt or the "free write" state, per the saved preference.
+  const applyPromptMode = () => {
+    const free = isFreeWrite();
+    if (promptRow) promptRow.hidden = free;
+    if (promptShow) promptShow.hidden = !free;
+    if (!free) setPrompt();
+  };
+  applyPromptMode();
+
   newEntryBtn.addEventListener("click", () => {
-    if (!composer.hidden) setPrompt();
+    if (!composer.hidden) applyPromptMode();
   });
+
   const shuffle = document.getElementById("prompt-shuffle");
   if (shuffle) shuffle.addEventListener("click", setPrompt);
+
+  const dismiss = document.getElementById("prompt-dismiss");
+  if (dismiss)
+    dismiss.addEventListener("click", () => {
+      setFreeWrite(true);
+      applyPromptMode();
+      composerText.focus();
+    });
+  if (promptShow)
+    promptShow.addEventListener("click", () => {
+      setFreeWrite(false);
+      applyPromptMode();
+    });
+
   // Tapping the prompt drops it in as a starting line.
   journalPromptEl.addEventListener("click", () => {
     if (!composer.hidden && !composerText.value.trim()) {
