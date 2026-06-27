@@ -21,7 +21,7 @@
 </head>
 <body class="has-dotgrid">
   <!-- Word preloader — a brief calm splash on the first visit of a session -->
-  <div class="preloader" id="preloader" aria-hidden="true">
+  <div class="preloader" id="preloader" hidden aria-hidden="true">
     <div class="preloader-inner">
       <img class="preloader-orb" src="icon.svg" alt="" width="56" height="56" />
       <p class="preloader-text"><span>A</span> <span>quiet</span> <span>place</span> <span>for</span> <span>your</span> <span>mind</span></p>
@@ -31,10 +31,14 @@
     (function () {
       var p = document.getElementById("preloader");
       if (!p) return;
+      // Only on the first load of a session ("startup") — never on later
+      // navigations back to Home. Hidden by default, so a "seen" load never
+      // flashes the splash before this runs.
       var seen = false;
       try { seen = sessionStorage.getItem("lumen-preloaded") === "1"; } catch (e) {}
       if (seen) { p.remove(); return; }
       try { sessionStorage.setItem("lumen-preloaded", "1"); } catch (e) {}
+      p.hidden = false;
       var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
       var done = function () {
         p.classList.add("done");

@@ -2363,8 +2363,9 @@ textarea:focus {
   margin: 0;
 }
 .scroll-stack-card p {
-  color: var(--ink-soft);
-  line-height: 1.65;
+  color: var(--ink);
+  font-size: 1.02rem;
+  line-height: 1.7;
   max-width: 34ch;
   margin: 0;
 }
@@ -2405,4 +2406,141 @@ body.is-scrolled .site-header {
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-progress-bar { transition: none; }
+}
+
+/* ===== Mood calendar (Trends) ===== */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+.cal-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.cal-nav {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cal-nav:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+.cal-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+.cal-dow span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+}
+.cal-cell {
+  aspect-ratio: 1;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+.cal-blank {
+  background: transparent;
+}
+.cal-none {
+  background: var(--field);
+  color: var(--ink-soft);
+}
+.cal-future {
+  opacity: 0.4;
+}
+.cal-has {
+  cursor: pointer;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.cal-has:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.cal-has.mood-c1 { background: var(--mood-1); }
+.cal-has.mood-c2 { background: var(--mood-2); }
+.cal-has.mood-c3 { background: var(--mood-3); }
+.cal-has.mood-c4 { background: var(--mood-4); }
+.cal-has.mood-c5 { background: var(--mood-5); }
+.cal-today {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.cal-detail {
+  margin: 0.9rem 0 0;
+  min-height: 1.2em;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-content: center;
+  margin: 0.9rem 0 0;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+.cal-sw {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 3px;
+  display: inline-block;
+}
+.cal-sw.mood-c1 { background: var(--mood-1); }
+.cal-sw.mood-c2 { background: var(--mood-2); }
+.cal-sw.mood-c3 { background: var(--mood-3); }
+.cal-sw.mood-c4 { background: var(--mood-4); }
+.cal-sw.mood-c5 { background: var(--mood-5); }
+
+/* Preloader hidden by default → only ever shows on a fresh session, never on
+   later Home navigations (and never flashes on a "seen" load). */
+.preloader[hidden] {
+  display: none;
+}
+
+/* A little more presence for the "Take a tour" button */
+#tour-start {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent-dark);
+}
+#tour-start:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: var(--accent);
 }

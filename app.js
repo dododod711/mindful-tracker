@@ -207,6 +207,7 @@ function render() {
   const entries = loadEntries();
   renderChart(entries);
   renderStats(entries);
+  renderCalendar(entries);
   renderInsights(entries);
   renderJournal(entries);
   renderStreakBanner(entries);
@@ -214,7 +215,89 @@ function render() {
   renderOnThisDay();
   renderLetters();
   renderWordPatterns(entries);
+  renderCalendar(entries);
 }
+
+// ---- Mood calendar (insights page): a month tinted by mood ----
+let calCursor = null; // first-of-month Date currently shown
+const CAL_MOOD_WORD = { 1: "Rough", 2: "Low", 3: "Okay", 4: "Good", 5: "Great" };
+
+function renderCalendar(entries) {
+  const grid = document.getElementById("cal-grid");
+  if (!grid) return;
+  const p2 = (n) => String(n).padStart(2, "0");
+  const byDate = {};
+  for (const e of entries) byDate[e.date] = e;
+
+  const now = new Date();
+  if (!calCursor) calCursor = new Date(now.getFullYear(), now.getMonth(), 1);
+  const year = calCursor.getFullYear();
+  const month = calCursor.getMonth();
+
+  const title = document.getElementById("cal-title");
+  if (title) title.textContent = calCursor.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  const nextBtn = document.getElementById("cal-next");
+  if (nextBtn) nextBtn.disabled = year === now.getFullYear() && month === now.getMonth();
+
+  grid.innerHTML = "";
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayK = todayKey();
+
+  for (let i = 0; i < firstDow; i++) {
+    const blank = document.createElement("div");
+    blank.className = "cal-cell cal-blank";
+    blank.setAttribute("aria-hidden", "true");
+    grid.appendChild(blank);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${year}-${p2(month + 1)}-${p2(d)}`;
+    const e = byDate[key];
+    const cell = document.createElement(e ? "button" : "div");
+    cell.className = "cal-cell " + (e ? "cal-has mood-c" + e.mood : "cal-none");
+    if (key === todayK) cell.classList.add("cal-today");
+    if (key > todayK) cell.classList.add("cal-future");
+    const num = document.createElement("span");
+    num.className = "cal-num";
+    num.textContent = d;
+    cell.appendChild(num);
+    if (e) {
+      cell.type = "button";
+      cell.setAttribute("aria-label", `${friendlyDate(key)} — ${CAL_MOOD_WORD[e.mood]} (${e.mood} of 5)`);
+      cell.addEventListener("click", () => showCalDetail(e));
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function showCalDetail(e) {
+  const el = document.getElementById("cal-detail");
+  if (!el) return;
+  const s = `${friendlyDate(e.date)} · ${CAL_MOOD_WORD[e.mood]} · ${e.sleep}h sleep · energy ${e.energy}/10 · stress ${e.stress}/10`;
+  el.textContent = e.note ? s + " — " + e.note : s;
+  el.classList.add("show");
+}
+
+// Month navigation (insights page)
+(function () {
+  const prev = document.getElementById("cal-prev");
+  const next = document.getElementById("cal-next");
+  const step = (delta) => {
+    const now = new Date();
+    if (!calCursor) calCursor = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (delta > 0 && calCursor.getFullYear() === now.getFullYear() && calCursor.getMonth() === now.getMonth()) return;
+    calCursor.setMonth(calCursor.getMonth() + delta);
+    renderCalendar(loadEntries());
+    const detail = document.getElementById("cal-detail");
+    if (detail) {
+      detail.textContent = "";
+      detail.classList.remove("show");
+    }
+  };
+  if (prev) prev.addEventListener("click", () => step(-1));
+  if (next) next.addEventListener("click", () => step(1));
+})();
 
 // ---- Patterns: plain-language observations from the check-in data ----
 const mean = (arr) => (arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0);

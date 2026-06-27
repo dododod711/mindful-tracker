@@ -75,6 +75,19 @@
           </p>
         </div>
 
+        <h2 class="reveal reveal-right">Your month</h2>
+        <div class="card cal-card reveal reveal-right">
+          <div class="cal-head">
+            <button type="button" id="cal-prev" class="cal-nav" aria-label="Previous month">‹</button>
+            <span id="cal-title" class="cal-title"></span>
+            <button type="button" id="cal-next" class="cal-nav" aria-label="Next month">›</button>
+          </div>
+          <div class="cal-dow" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+          <div id="cal-grid" class="cal-grid"></div>
+          <p id="cal-detail" class="cal-detail" role="status" aria-live="polite"></p>
+          <p class="cal-legend"><span>Rough</span><i class="cal-sw mood-c1"></i><i class="cal-sw mood-c2"></i><i class="cal-sw mood-c3"></i><i class="cal-sw mood-c4"></i><i class="cal-sw mood-c5"></i><span>Great</span></p>
+        </div>
+
         <h2 class="reveal reveal-right">What we're noticing</h2>
         <div class="card reveal reveal-right">
           <ul id="insights-list" class="insights">
