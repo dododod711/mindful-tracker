@@ -111,6 +111,38 @@
       </div>
     </section>
 
+    <!-- Your month — streak summary + mood calendar (hidden until first check-in) -->
+    <section id="home-month" class="section section-alt" hidden>
+      <div class="container">
+        <h2 class="reveal reveal-up cal-section-title">Your month</h2>
+        <div class="streak-stats reveal reveal-up">
+          <div class="streak-stat">
+            <span class="streak-stat-num" id="streak-current">0</span>
+            <span class="streak-stat-label">day streak</span>
+          </div>
+          <div class="streak-stat">
+            <span class="streak-stat-num" id="streak-best">0</span>
+            <span class="streak-stat-label">best streak</span>
+          </div>
+          <div class="streak-stat">
+            <span class="streak-stat-num" id="streak-total">0</span>
+            <span class="streak-stat-label">check-ins</span>
+          </div>
+        </div>
+        <div class="card cal-card reveal reveal-up">
+          <div class="cal-head">
+            <button type="button" id="cal-prev" class="cal-nav" aria-label="Previous month">‹</button>
+            <span id="cal-title" class="cal-title"></span>
+            <button type="button" id="cal-next" class="cal-nav" aria-label="Next month">›</button>
+          </div>
+          <div class="cal-dow" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+          <div id="cal-grid" class="cal-grid"></div>
+          <p id="cal-detail" class="cal-detail" role="status" aria-live="polite"></p>
+          <p class="cal-legend"><span>Rough</span><i class="cal-sw mood-c1"></i><i class="cal-sw mood-c2"></i><i class="cal-sw mood-c3"></i><i class="cal-sw mood-c4"></i><i class="cal-sw mood-c5"></i><span>Great</span></p>
+        </div>
+      </div>
+    </section>
+
     <!-- Disclaimer -->
     <section id="disclaimer" class="section section-alt">
       <div class="container">

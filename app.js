@@ -213,11 +213,11 @@ function render() {
   renderInsights(entries);
   renderJournal(entries);
   renderStreakBanner(entries);
+  renderHomeStreaks(entries);
   updateCheckinButton(entries);
   renderOnThisDay();
   renderLetters();
   renderWordPatterns(entries);
-  renderCalendar(entries);
 }
 
 // ---- Mood calendar (insights page): a month tinted by mood ----
@@ -654,6 +654,40 @@ function renderStreakBanner(entries) {
   const streak = currentStreak(entries);
   banner.hidden = streak < 2;
   banner.innerHTML = `${ICON.streak} ${streak}-day check-in streak`;
+}
+
+// The longest run of consecutive days ever checked in — a quietly motivating
+// "personal best" that survives a broken current streak.
+function longestStreak(entries) {
+  const days = [...new Set(entries.map((e) => e.date))].sort();
+  let best = 0, run = 0, prevMs = null;
+  for (const d of days) {
+    const ms = new Date(d + "T00:00:00").getTime();
+    if (prevMs !== null && Math.round((ms - prevMs) / 86400000) === 1) run++;
+    else run = 1;
+    if (run > best) best = run;
+    prevMs = ms;
+  }
+  return best;
+}
+
+// Home page: a small streak/total summary above the month calendar. The whole
+// section is hidden until there's at least one check-in to talk about.
+function renderHomeStreaks(entries) {
+  const section = document.getElementById("home-month");
+  if (!section) return;
+  section.hidden = entries.length === 0;
+  if (entries.length === 0) return;
+  const cur = currentStreak(entries);
+  const best = Math.max(longestStreak(entries), cur);
+  const total = new Set(entries.map((e) => e.date)).size;
+  const set = (id, n) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = n;
+  };
+  set("streak-current", cur);
+  set("streak-best", best);
+  set("streak-total", total);
 }
 
 function renderJournal(entries) {

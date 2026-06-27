@@ -2457,6 +2457,47 @@ body.is-scrolled .site-header {
   .scroll-progress-bar { transition: none; }
 }
 
+/* ===== Home: streak summary above the month calendar ===== */
+.cal-section-title {
+  text-align: center;
+}
+.streak-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  max-width: 460px;
+  margin: 0 auto 1.4rem;
+}
+.streak-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 1rem 0.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.streak-stat-num {
+  font-family: var(--serif);
+  font-size: clamp(1.7rem, 6vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--accent-dark);
+}
+@media (prefers-color-scheme: dark) {
+  .streak-stat-num { color: var(--accent); }
+}
+.streak-stat-label {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  text-align: center;
+}
+#home-month .cal-card {
+  max-width: 460px;
+  margin-inline: auto;
+}
+
 /* ===== Mood calendar (Trends) ===== */
 .cal-head {
   display: flex;
