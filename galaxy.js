@@ -48,6 +48,30 @@ function loadJournal() {
   }
 }
 
+// Daily check-ins carry a mood (1–5) and an optional note. We tint each of the
+// user's stars by the mood logged that same day, so the sky reflects how those
+// days actually felt — using a brighter version of the app's red→green scale.
+const ENTRIES_KEY = "mindful-entries";
+function loadEntries() {
+  try {
+    return JSON.parse(localStorage.getItem(ENTRIES_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+const MOOD_COLOR = { 1: "#d97363", 2: "#d99a5e", 3: "#cdb15c", 4: "#9cc070", 5: "#8caf91" };
+const MOOD_LABEL = { 1: "Rough", 2: "Low", 3: "Okay", 4: "Good", 5: "Great" };
+const dayKey = (ts) => {
+  const d = new Date(ts);
+  if (isNaN(+d)) return null;
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
+const prettyDay = (key) => {
+  const d = new Date(key + "T12:00:00");
+  return isNaN(+d) ? key : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};
+
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---- Planet & ring constants ----
@@ -139,21 +163,42 @@ function buildBodies() {
       ro: o.ro, ang: o.ang, speed: o.speed, r: b.kind === "planet" ? 4.2 : 3.0 });
   });
 
-  // The user's journal entries take their own orbits.
+  // The user's journal entries take their own orbits, tinted by that day's mood.
+  const moodByDay = {};
+  for (const e of loadEntries()) if (e && e.date) moodByDay[e.date] = e.mood;
+
   loadJournal().forEach((n) => {
     if (!n || !n.text) return;
     const when = new Date(n.ts);
+    const mood = moodByDay[dayKey(n.ts)];
     const o = placeFor("j" + n.id, () => ({
       ro: 0.55 + Math.random() * 0.55,
       ang: Math.random() * Math.PI * 2,
       speed: orbitSpeed() * (Math.random() < 0.5 ? 1 : -1),
     }));
     list.push({
-      cat: "you", kind: "star", key: "j" + n.id, color: CAT_COLOR.you,
+      cat: "you", kind: "star", key: "j" + n.id,
+      color: mood ? MOOD_COLOR[mood] : CAT_COLOR.you, mood: mood || null,
       title: isNaN(+when)
         ? "Journal note"
         : when.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
       body: n.text, ro: o.ro, ang: o.ang, speed: o.speed, r: 3.0,
+    });
+  });
+
+  // Check-in notes become stars too, each in its own day's mood colour.
+  loadEntries().forEach((e) => {
+    if (!e || !e.note || !e.note.trim()) return;
+    const o = placeFor("e" + e.date, () => ({
+      ro: 0.55 + Math.random() * 0.55,
+      ang: Math.random() * Math.PI * 2,
+      speed: orbitSpeed() * (Math.random() < 0.5 ? 1 : -1),
+    }));
+    list.push({
+      cat: "you", kind: "star", key: "e" + e.date,
+      color: e.mood ? MOOD_COLOR[e.mood] : CAT_COLOR.you, mood: e.mood || null,
+      title: prettyDay(e.date),
+      body: e.note, ro: o.ro, ang: o.ang, speed: o.speed, r: 3.0,
     });
   });
 
@@ -530,7 +575,7 @@ function openBody(b) {
   bodies.forEach((x) => (x.selected = false));
   b.selected = true;
   panelChip.className = "panel-chip " + b.cat;
-  panelChip.textContent = CAT_LABEL[b.cat];
+  panelChip.textContent = b.mood ? CAT_LABEL[b.cat] + " · " + MOOD_LABEL[b.mood] : CAT_LABEL[b.cat];
   panelTitle.textContent = b.title;
   panelBody.textContent = b.body;
   panel.classList.add("open");
@@ -617,7 +662,7 @@ function buildIndexList() {
     const btn = document.createElement("button");
     const cat = document.createElement("span");
     cat.className = "item-cat " + b.cat;
-    cat.textContent = CAT_LABEL[b.cat];
+    cat.textContent = b.mood ? CAT_LABEL[b.cat] + " · " + MOOD_LABEL[b.mood] : CAT_LABEL[b.cat];
     btn.appendChild(cat);
     btn.appendChild(document.createTextNode(b.title));
     btn.addEventListener("click", () => { openBody(b); closeIndex(); });

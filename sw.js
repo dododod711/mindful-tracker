@@ -6,7 +6,7 @@
 // Bump this on every meaningful release. The activate handler wipes older
 // caches, and the network-first fetch handler (below) means returning users
 // get fresh files while online and still fall back to this cache offline.
-const CACHE = "mindful-v11";
+const CACHE = "mindful-v12";
 const ASSETS = [
   "./",
   "index.html",
