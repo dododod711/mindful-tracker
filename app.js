@@ -207,6 +207,7 @@ function render() {
   const entries = loadEntries();
   renderChart(entries);
   renderStats(entries);
+  renderWeeklyRecap(entries);
   renderCalendar(entries);
   renderInsights(entries);
   renderJournal(entries);
@@ -298,6 +299,74 @@ function showCalDetail(e) {
   if (prev) prev.addEventListener("click", () => step(-1));
   if (next) next.addEventListener("click", () => step(1));
 })();
+
+// ---- Weekly recap (insights page): a calm, on-device summary of the week ----
+function listJoin(arr) {
+  if (arr.length <= 1) return arr.join("");
+  return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
+}
+
+function renderWeeklyRecap(entries) {
+  const box = document.getElementById("weekly-recap");
+  if (!box) return;
+
+  const thisWeek = entries.filter((e) => e.date >= todayKey(6));
+  const lastWeek = entries.filter((e) => e.date >= todayKey(13) && e.date <= todayKey(7));
+  const notesThisWeek = loadNotes().filter((n) => n && n.text && dayKeyOf(n.ts) >= todayKey(6));
+  const checkins = thisWeek.length;
+  const journaled = notesThisWeek.length;
+
+  if (checkins === 0 && journaled === 0) {
+    box.innerHTML =
+      '<p class="recap-empty">Check in or journal a few times this week and a gentle recap will appear here.</p>';
+    return;
+  }
+
+  const avgThis = avg(thisWeek.map((e) => e.mood));
+  const avgLast = avg(lastWeek.map((e) => e.mood));
+
+  // What came up most in this week's writing.
+  const texts = [...notesThisWeek.map((n) => n.text), ...thisWeek.map((e) => e.note).filter(Boolean)];
+  const counts = {};
+  for (const t of texts) for (const th of detectThemes(t)) counts[th.key] = (counts[th.key] || 0) + 1;
+  let topKey = null;
+  for (const k in counts) if (!topKey || counts[k] > counts[topKey]) topKey = k;
+  const topLabel = topKey ? THEMES.find((t) => t.key === topKey).label : null;
+
+  const did = [];
+  if (checkins) did.push(`checked in ${checkins} time${checkins === 1 ? "" : "s"}`);
+  if (journaled) did.push(`journaled ${journaled} time${journaled === 1 ? "" : "s"}`);
+  let text = "This week you've " + listJoin(did) + ".";
+
+  if (avgThis != null) {
+    text += ` Your mood averaged ${avgThis.toFixed(1)}/5`;
+    if (avgLast != null) {
+      const diff = avgThis - avgLast;
+      text +=
+        Math.abs(diff) < 0.25
+          ? " — about the same as last week."
+          : ` — ${diff > 0 ? "up" : "down"} from ${avgLast.toFixed(1)} last week.`;
+    } else {
+      text += ".";
+    }
+  }
+  if (topLabel) text += ` You wrote most about ${topLabel}.`;
+
+  box.innerHTML = "";
+  const p = document.createElement("p");
+  p.className = "recap-text";
+  p.textContent = text;
+  box.appendChild(p);
+
+  if (avgThis != null && avgLast != null) {
+    const diff = avgThis - avgLast;
+    const steady = Math.abs(diff) < 0.25;
+    const chip = document.createElement("span");
+    chip.className = "recap-trend " + (steady ? "steady" : diff > 0 ? "up" : "down");
+    chip.textContent = steady ? "Steady" : (diff > 0 ? "↑ " : "↓ ") + Math.abs(diff).toFixed(1) + " vs last week";
+    box.appendChild(chip);
+  }
+}
 
 // ---- Patterns: plain-language observations from the check-in data ----
 const mean = (arr) => (arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0);

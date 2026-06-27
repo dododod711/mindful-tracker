@@ -2528,6 +2528,38 @@ body.is-scrolled .site-header {
 .cal-sw.mood-c4 { background: var(--mood-4); }
 .cal-sw.mood-c5 { background: var(--mood-5); }
 
+/* ===== Weekly recap ===== */
+.recap-text {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 0;
+}
+.recap-empty {
+  color: var(--ink-soft);
+  margin: 0;
+}
+.recap-trend {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.recap-trend.up {
+  background: color-mix(in srgb, var(--mood-5) 20%, var(--card));
+  color: var(--mood-5);
+}
+.recap-trend.down {
+  background: color-mix(in srgb, var(--mood-1) 18%, var(--card));
+  color: var(--mood-1);
+}
+.recap-trend.steady {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
 /* Preloader hidden by default → only ever shows on a fresh session, never on
    later Home navigations (and never flashes on a "seen" load). */
 .preloader[hidden] {
