@@ -95,6 +95,8 @@ if (form) {
       setTimeout(() => (saveMsg.hidden = true), 3000);
     }
     render();
+    // If Friends is on and signed in, push the new mood/streak (no-op otherwise).
+    if (window.LumenSync) window.LumenSync.pushState();
   });
 }
 
@@ -1113,6 +1115,9 @@ function attachDictation(btn, field) {
 
 attachDictation(document.getElementById("journal-mic"), document.getElementById("journal-text"));
 attachDictation(document.getElementById("chat-mic"), document.getElementById("chat-input"));
+
+// Helpers the opt-in Friends feature reuses (friends.js), kept decoupled.
+window.Lumen = { loadEntries, currentStreak, moodFace, friendlyDate };
 
 // Initial paint — now that every helper above is defined.
 render();

@@ -31,6 +31,7 @@
         <a href="index.html">Home</a>
         <a href="today.html#checkin" class="active">Check-in</a>
         <a href="insights.html#trends">Trends</a>
+        <a href="friends.html">Friends</a>
         <a href="galaxy.html">Stargaze</a>
       </nav>
     </div>
@@ -206,13 +207,16 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>Lumen — your data stays in your browser. For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
+      <p>Lumen — your journal stays in your browser. For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
     </div>
   </footer>
 
   <script src="iridescence.js"></script>
   <script src="app.js"></script>
   <script src="ui.js"></script>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="friends.js"></script>
   <script>
     if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
       navigator.serviceWorker.register("sw.js").catch(() => {});

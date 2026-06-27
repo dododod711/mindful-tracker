@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Lumen Friends — share your mood and streak with a few people you trust, and cheer each other on. Opt-in; your journal always stays on your device." />
+  <meta property="og:title" content="Lumen — Friends" />
+  <meta property="og:description" content="Share your mood and streak with people you trust, and cheer each other on." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <title>Lumen — Friends</title>
+  <link rel="icon" href="icon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#4f7259" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Lumen" />
+  <link rel="stylesheet" href="styles.css" />
+  <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
+</head>
+<body class="has-dotgrid">
+  <canvas id="dot-bg" class="dot-bg" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <img class="brand-mark" src="icon.svg" alt="" width="28" height="28" />
+        <span class="brand-name">Lumen</span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="today.html#checkin">Check-in</a>
+        <a href="insights.html#trends">Trends</a>
+        <a href="friends.html" class="active">Friends</a>
+        <a href="galaxy.html">Stargaze</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1 class="reveal reveal-up">Friends</h1>
+        <p class="hero-sub reveal reveal-up">Share how you're doing with a few people you trust — and cheer each other on. Only your mood, streak and last check-in are shared; your journal always stays on your device.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container" id="friends-app">
+
+        <!-- Signed out -->
+        <div id="auth-view" class="card auth-card" hidden>
+          <div class="auth-tabs">
+            <button type="button" id="tab-signin" class="auth-tab active">Sign in</button>
+            <button type="button" id="tab-signup" class="auth-tab">Create account</button>
+          </div>
+          <form id="auth-form" autocomplete="on">
+            <div class="auth-field" id="username-field" hidden>
+              <label for="f-username">Username</label>
+              <input id="f-username" name="username" autocomplete="username" placeholder="how friends find you" />
+            </div>
+            <div class="auth-field">
+              <label for="f-email">Email</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="auth-field">
+              <label for="f-password">Password</label>
+              <input id="f-password" name="password" type="password" autocomplete="current-password" minlength="6" required />
+            </div>
+            <button type="submit" id="auth-submit" class="btn-primary">Sign in</button>
+            <p id="auth-msg" class="form-msg" hidden></p>
+          </form>
+          <div class="auth-guest">
+            <span class="auth-or">or</span>
+            <button type="button" id="guest-enter" class="btn-ghost">Continue as a guest</button>
+          </div>
+          <p class="friends-note">Friends syncs only your mood, streak and last check-in to people you approve. Your journal and notes never leave your device.</p>
+        </div>
+
+        <!-- Guest -->
+        <div id="guest-view" class="card guest-card" hidden>
+          <span class="guest-icon" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+          <h2>You’re exploring as a guest</h2>
+          <p>Your check-ins and journal work fully on this device — no account needed. Connecting with friends is the one thing that needs an account, so you can share your mood and cheer each other on.</p>
+          <div class="guest-actions">
+            <button type="button" id="guest-signin" class="btn-primary">Sign in to connect</button>
+            <a class="btn-ghost" href="today.html#checkin">Keep exploring</a>
+          </div>
+          <p class="friends-note">Staying a guest keeps everything on your device. Nothing syncs until you make an account.</p>
+        </div>
+
+        <!-- Signed in -->
+        <div id="friends-view" hidden>
+          <div class="card you-card reveal reveal-up">
+            <div class="you-row">
+              <div>
+                <p class="you-label">Signed in as</p>
+                <p class="you-name" id="you-name">—</p>
+              </div>
+              <button type="button" id="sign-out" class="btn-ghost">Sign out</button>
+            </div>
+            <div class="status-row">
+              <input id="status-note" maxlength="80" placeholder="A short status for friends (optional)…" />
+              <button type="button" id="status-save" class="btn-ghost">Save</button>
+            </div>
+          </div>
+
+          <div class="card reveal reveal-up" id="encouragements-card" hidden>
+            <h2>Cheers for you</h2>
+            <ul id="encouragements-list" class="enc-list"></ul>
+          </div>
+
+          <div class="card reveal reveal-up">
+            <h2>Add a friend</h2>
+            <form id="add-form" class="add-form">
+              <input id="add-username" placeholder="Their username" autocomplete="off" />
+              <button type="submit" class="btn-primary">Send request</button>
+            </form>
+            <p id="add-msg" class="form-msg" hidden></p>
+          </div>
+
+          <div class="card reveal reveal-up" id="requests-card" hidden>
+            <h2>Requests</h2>
+            <ul id="requests-list" class="req-list"></ul>
+          </div>
+
+          <div class="card reveal reveal-up">
+            <div class="friends-head">
+              <h2>Your friends</h2>
+              <button type="button" id="refresh" class="prompt-shuffle" aria-label="Refresh">↻</button>
+            </div>
+            <ul id="friends-list" class="friend-list">
+              <li class="empty-state">No friends yet — add someone above.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Disclaimer -->
+    <section id="disclaimer" class="section section-alt">
+      <div class="container">
+        <div class="disclaimer reveal reveal-up">
+          <h2><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 19H3z"/><path d="M12 10v4"/><path d="M12 17v.01"/></svg>Disclaimer</h2>
+          <p>
+            Lumen is built for <strong>educational and self-reflection purposes only</strong>.
+            Friends is an optional way to stay connected — it is not a crisis or monitoring
+            service, and you should not rely on it to know whether someone is safe.
+          </p>
+          <p>
+            If you or a friend are struggling, please reach out to a qualified professional.
+            In the US, call or text <strong>988</strong> any time.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Lumen — your check-ins and journal stay in your browser. Friends shares only your mood &amp; streak with people you approve. For educational purposes only — see the <a href="#disclaimer">disclaimer</a>.</p>
+    </div>
+  </footer>
+
+  <script src="iridescence.js"></script>
+  <script src="app.js"></script>
+  <script src="ui.js"></script>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="friends.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+  </script>
+</body>
+</html>

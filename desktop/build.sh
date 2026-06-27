@@ -14,6 +14,7 @@ cp "../index.html" \
    "../today.html" \
    "../insights.html" \
    "../galaxy.html" \
+   "../friends.html" \
    "../styles.css" \
    "../galaxy.css" \
    "../app.js" \
@@ -22,6 +23,8 @@ cp "../index.html" \
    "../handtracking.js" \
    "../iridescence.js" \
    "../tour.js" \
+   "../config.js" \
+   "../friends.js" \
    "../manifest.webmanifest" \
    "../icon.svg" \
    "../sw.js" \
