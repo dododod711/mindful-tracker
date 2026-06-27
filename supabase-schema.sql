@@ -80,9 +80,21 @@ create table if not exists public.shared_state (
 
 alter table public.shared_state enable row level security;
 
+-- You can read your own state, and the state of anyone you're accepted friends
+-- with. (This also lets Realtime stream friends' updates to the browser, since
+-- Realtime only delivers rows a client is allowed to SELECT.)
 drop policy if exists "read own state" on public.shared_state;
-create policy "read own state" on public.shared_state
-  for select using (user_id = auth.uid());
+drop policy if exists "read own or friends state" on public.shared_state;
+create policy "read own or friends state" on public.shared_state
+  for select using (
+    user_id = auth.uid()
+    or exists (
+      select 1 from public.friendships f
+      where f.status = 'accepted'
+        and ( (f.requester = auth.uid() and f.addressee = shared_state.user_id)
+           or (f.addressee = auth.uid() and f.requester = shared_state.user_id) )
+    )
+  );
 
 drop policy if exists "upsert own state" on public.shared_state;
 create policy "upsert own state" on public.shared_state
@@ -249,3 +261,23 @@ grant execute on function
   public.get_encouragements(),
   public.mark_encouragements_read()
 to authenticated;
+
+-- ---------- Realtime ----------
+-- Stream changes to the browser so friends' moods, requests and encouragements
+-- update live (no refresh button needed). RLS still applies to Realtime, so a
+-- client only ever receives rows it is allowed to read.
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables
+                 where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'shared_state') then
+    alter publication supabase_realtime add table public.shared_state;
+  end if;
+  if not exists (select 1 from pg_publication_tables
+                 where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'friendships') then
+    alter publication supabase_realtime add table public.friendships;
+  end if;
+  if not exists (select 1 from pg_publication_tables
+                 where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'encouragements') then
+    alter publication supabase_realtime add table public.encouragements;
+  end if;
+end $$;

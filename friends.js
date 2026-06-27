@@ -295,13 +295,37 @@
     );
   }
 
+  // ----- Live updates via Supabase Realtime (RLS-scoped to you + your friends) -----
+  let channel = null;
+  async function startRealtime(user) {
+    stopRealtime();
+    try {
+      const { data } = await sb.auth.getSession();
+      if (data && data.session) sb.realtime.setAuth(data.session.access_token);
+    } catch (e) {}
+    channel = sb
+      .channel("lumen-" + user.id)
+      .on("postgres_changes", { event: "*", schema: "public", table: "shared_state" }, () => renderFriends())
+      .on("postgres_changes", { event: "*", schema: "public", table: "friendships" }, () => { renderRequests(); renderFriends(); })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "encouragements", filter: "to_user=eq." + user.id }, () => renderEncouragements())
+      .subscribe();
+  }
+  function stopRealtime() {
+    if (channel) {
+      try { sb.removeChannel(channel); } catch (e) {}
+      channel = null;
+    }
+  }
+
   // ----- Auth state drives which view shows: auth / guest / signed-in -----
   function showAuth() {
+    stopRealtime();
     authView.hidden = false;
     guestView.hidden = true;
     friendsView.hidden = true;
   }
   function showGuest() {
+    stopRealtime();
     authView.hidden = true;
     guestView.hidden = false;
     friendsView.hidden = true;
@@ -312,6 +336,7 @@
     friendsView.hidden = false;
     await loadMe(user);
     refresh();
+    startRealtime(user);
   }
   // No session: a guest sees the locked panel, everyone else the sign-in form.
   function showSignedOut() {

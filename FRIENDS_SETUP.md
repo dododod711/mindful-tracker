@@ -68,8 +68,10 @@ inbox before their first sign-in).
   they make an account.
 - **What syncs:** mood (1–5), current streak, last check-in date, optional status.
   Nothing else — and never journal text.
-- **Refresh, not realtime:** the friends list updates on load and when you press the
-  refresh button. (Supabase Realtime could make it live later.)
+- **Live updates:** friends' moods, incoming requests and encouragements stream in
+  over Supabase Realtime — no refresh needed. The ↻ button stays as a manual
+  fallback if the live connection drops. (Realtime is enabled by the schema, which
+  adds the relevant tables to the `supabase_realtime` publication.)
 - **Free tier** is plenty for friends-and-family use. If a project is paused for
   inactivity, opening the dashboard resumes it.
 - **Desktop app:** Friends targets the web build (https on Vercel). The macOS
