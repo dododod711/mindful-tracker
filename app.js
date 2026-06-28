@@ -1338,8 +1338,14 @@ function renderLetters() {
   const sealedEl = document.getElementById("letters-sealed");
   if (sealedEl) {
     sealedEl.hidden = sealed.length === 0;
-    if (sealed.length)
-      sealedEl.innerHTML = `${ICON.lock} ${sealed.length} sealed — next opens ${friendlyDate(sealed[0].deliverOn)}.`;
+    if (sealed.length) {
+      const days = Math.round(
+        (new Date(sealed[0].deliverOn + "T00:00:00") - new Date(today + "T00:00:00")) / 86400000
+      );
+      const when = days <= 1 ? "tomorrow" : `in ${days} days`;
+      const count = sealed.length === 1 ? "1 sealed letter" : `${sealed.length} sealed letters`;
+      sealedEl.innerHTML = `${ICON.lock} ${count} — next opens ${friendlyDate(sealed[0].deliverOn)} (${when}).`;
+    }
   }
 }
 
