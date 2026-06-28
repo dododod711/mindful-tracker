@@ -104,6 +104,37 @@ drop policy if exists "update own state" on public.shared_state;
 create policy "update own state" on public.shared_state
   for update using (user_id = auth.uid());
 
+-- ---------- Personal cloud sync (private to each user) ----------
+-- Opt-in: when signed in, the app mirrors a few localStorage blobs here so a
+-- user's own check-ins / journal / good things / letters follow them across
+-- devices. Unlike shared_state, this is PRIVATE to the owner — no friend, and
+-- no other user, can ever read it. Each row is one JSON blob keyed by name.
+create table if not exists public.user_state (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  key        text not null,
+  value      jsonb not null,
+  updated_at timestamptz default now(),
+  primary key (user_id, key)
+);
+
+alter table public.user_state enable row level security;
+
+drop policy if exists "read own user_state" on public.user_state;
+create policy "read own user_state" on public.user_state
+  for select using (user_id = auth.uid());
+
+drop policy if exists "insert own user_state" on public.user_state;
+create policy "insert own user_state" on public.user_state
+  for insert with check (user_id = auth.uid());
+
+drop policy if exists "update own user_state" on public.user_state;
+create policy "update own user_state" on public.user_state
+  for update using (user_id = auth.uid());
+
+drop policy if exists "delete own user_state" on public.user_state;
+create policy "delete own user_state" on public.user_state
+  for delete using (user_id = auth.uid());
+
 -- ---------- Encouragements ----------
 create table if not exists public.encouragements (
   id         uuid primary key default gen_random_uuid(),

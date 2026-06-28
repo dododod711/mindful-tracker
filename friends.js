@@ -59,6 +59,144 @@
     }
   };
 
+  // ---------- Personal cloud sync (private to the signed-in user) ----------
+  // When signed in, a few localStorage blobs are mirrored to a private
+  // user_state table so a person's own check-ins / journal / good things /
+  // letters follow them across devices. Signed out, nothing leaves the device.
+  //
+  // Each blob is an array; we merge by a stable key (never clobbering a day or
+  // item that exists on only one side). On a same-key conflict the local copy
+  // wins, so the device you're actively using is authoritative.
+  const SYNC_KEYS = {
+    "mindful-entries": (x) => x.date,
+    "mindful-journal": (x) => x.id,
+    "mindful-good-things": (x) => x.date,
+    "mindful-letters": (x) => x.id,
+    "mindful-milestones": null, // array of scalar streak numbers
+  };
+  const SYNC_KEY_LIST = Object.keys(SYNC_KEYS);
+  const UID_KEY = "lumen-sync-uid"; // who localStorage was last synced as
+  const _setItem = localStorage.setItem.bind(localStorage);
+  const safeParse = (s) => {
+    try { return JSON.parse(s); } catch (e) { return null; }
+  };
+
+  function mergeKey(key, localVal, remoteVal) {
+    const keyFn = SYNC_KEYS[key];
+    const a = Array.isArray(localVal) ? localVal : [];
+    const b = Array.isArray(remoteVal) ? remoteVal : [];
+    if (!keyFn) return [...new Set([...b, ...a])]; // scalar union (milestones)
+    const map = new Map();
+    for (const it of b) if (it != null) map.set(keyFn(it), it); // remote first
+    for (const it of a) if (it != null) map.set(keyFn(it), it); // local wins
+    return [...map.values()];
+  }
+
+  async function currentUserId() {
+    try {
+      const { data } = await sb.auth.getUser();
+      return data && data.user ? data.user.id : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Debounced push of whatever keys changed locally.
+  let applyingRemote = false;
+  const dirty = new Set();
+  let pushTimer = null;
+  localStorage.setItem = function (k, v) {
+    _setItem(k, v);
+    if (!applyingRemote && SYNC_KEY_LIST.indexOf(k) !== -1) {
+      dirty.add(k);
+      clearTimeout(pushTimer);
+      pushTimer = setTimeout(flushPush, 1200);
+    }
+  };
+
+  async function flushPush() {
+    const uid = await currentUserId();
+    if (!uid) { dirty.clear(); return; }
+    const keys = [...dirty];
+    dirty.clear();
+    const rows = keys
+      .map((k) => ({
+        user_id: uid,
+        key: k,
+        value: safeParse(localStorage.getItem(k)),
+        updated_at: new Date().toISOString(),
+      }))
+      .filter((r) => r.value != null);
+    if (!rows.length) return;
+    try { await sb.from("user_state").upsert(rows); } catch (e) { /* offline */ }
+  }
+
+  // Pull remote state, merge into local, push the merged result back, re-render.
+  let pulling = null;
+  function pull() {
+    if (pulling) return pulling; // coalesce concurrent calls
+    pulling = (async () => {
+      const uid = await currentUserId();
+      if (!uid) return;
+      let rows;
+      try {
+        const res = await sb.from("user_state").select("key,value").eq("user_id", uid);
+        if (res.error) return;
+        rows = res.data || [];
+      } catch (e) {
+        return; // offline — keep working locally
+      }
+      const remote = {};
+      for (const r of rows) remote[r.key] = r.value;
+
+      // Shared-browser safety: only merge local up into the account if this is
+      // the same person as last time (or the very first sign-in on this
+      // browser). If a *different* account signs in, treat their cloud copy as
+      // authoritative and replace local — never upload the previous user's
+      // on-device data into someone else's account.
+      let lastUid = null;
+      try { lastUid = localStorage.getItem(UID_KEY); } catch (e) {}
+      const differentUser = lastUid && lastUid !== uid;
+
+      const toPush = [];
+      applyingRemote = true;
+      try {
+        for (const key of SYNC_KEY_LIST) {
+          const storedStr = localStorage.getItem(key);
+          const localVal = differentUser ? [] : (safeParse(storedStr) || []);
+          const remoteVal = remote[key] != null ? remote[key] : [];
+          const merged = mergeKey(key, localVal, remoteVal);
+          const mergedStr = JSON.stringify(merged);
+          // Compare against what's actually stored so a different user with an
+          // empty cloud copy still clears the previous user's local data.
+          if (mergedStr !== (storedStr || "[]")) _setItem(key, mergedStr);
+          if (mergedStr !== JSON.stringify(remoteVal)) {
+            toPush.push({ user_id: uid, key, value: merged, updated_at: new Date().toISOString() });
+          }
+        }
+        try { _setItem(UID_KEY, uid); } catch (e) {}
+      } finally {
+        applyingRemote = false;
+      }
+      if (toPush.length) {
+        try { await sb.from("user_state").upsert(toPush); } catch (e) { /* offline */ }
+      }
+      if (typeof window.render === "function") { try { window.render(); } catch (e) {} }
+      if (window.LumenSync.pushState) window.LumenSync.pushState();
+    })().finally(() => { pulling = null; });
+    return pulling;
+  }
+
+  window.LumenSync.pull = pull;
+
+  // Sync on sign-in, on page load if a session already exists, and when the tab
+  // regains focus (to catch edits made on another device).
+  sb.auth.onAuthStateChange((event, session) => {
+    if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) pull();
+  });
+  sb.auth.getSession().then(({ data }) => { if (data && data.session) pull(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) pull(); });
+
   // If this isn't the Friends page, we're done after wiring sync.
   if (!pageEl) return;
 
